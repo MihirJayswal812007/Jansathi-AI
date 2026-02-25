@@ -64,6 +64,16 @@ export const AUTH = {
     sessionCookieName: optionalEnv("SESSION_COOKIE_NAME", "jansathi_sid"),
     sessionMaxAgeSeconds: intEnv("SESSION_MAX_AGE_SECONDS", 30 * 24 * 60 * 60), // 30 days
     adminSecret: optionalEnv("ADMIN_SECRET", ""),
+    tokenBytes: intEnv("SESSION_TOKEN_BYTES", 32), // 32 bytes = 256-bit entropy
+} as const;
+
+/** OTP Configuration */
+export const OTP = {
+    codeLength: intEnv("OTP_CODE_LENGTH", 6),
+    expirySeconds: intEnv("OTP_EXPIRY_SECONDS", 300), // 5 minutes
+    maxAttempts: intEnv("OTP_MAX_ATTEMPTS", 5),
+    rateLimitPerIdentifier: intEnv("OTP_RATE_LIMIT", 3), // max OTPs per window
+    rateLimitWindowSeconds: intEnv("OTP_RATE_LIMIT_WINDOW", 600), // 10 minutes
 } as const;
 
 /** Application */

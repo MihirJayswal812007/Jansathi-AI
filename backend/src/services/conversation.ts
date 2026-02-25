@@ -159,32 +159,3 @@ export async function endConversation(
     });
 }
 
-// ── Track Analytics Event ───────────────────────────────────
-export async function trackEvent(
-    type: string,
-    sessionId: string,
-    metadata: Record<string, unknown> = {},
-    userId?: string | null,
-    mode?: string | null
-): Promise<void> {
-    try {
-        await prisma.analyticsEvent.create({
-            data: {
-                type,
-                userId: userId || null,
-                mode: mode || null,
-                metadata: metadata as any,
-                sessionId,
-            },
-        });
-
-        logger.debug("analytics.event.tracked", { type, sessionId, mode });
-    } catch (error) {
-        // Analytics should never break the user flow
-        logger.error("analytics.event.failed", {
-            type,
-            sessionId,
-            error: error instanceof Error ? error.message : String(error),
-        });
-    }
-}

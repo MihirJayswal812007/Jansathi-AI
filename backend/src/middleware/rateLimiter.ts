@@ -2,52 +2,28 @@
 // Per-route + per-IP rate limiting to prevent cross-route DoS attacks.
 // Key format: "ip:routePrefix" ensures hammering /weather doesn't exhaust the
 // /chat budget, and vice versa.
+// Store is async — supports both MemoryStore and RedisStore.
 
 import { Request, Response, NextFunction } from "express";
+import { createStore, type IRateLimiterStore } from "../stores/storeFactory";
 import logger from "../utils/logger";
 
 // ── Rate limit configs per route family ───────────────────────
 const CONFIGS: Record<string, { max: number; windowMs: number }> = {
     "/api/chat": { max: 10, windowMs: 60_000 },
     "/api/analytics": { max: 50, windowMs: 60_000 },
+    "/api/auth": { max: 5, windowMs: 60_000 },
+    "/api/admin": { max: 20, windowMs: 60_000 },
     default: { max: 30, windowMs: 60_000 },
 };
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-
-// ── IRateLimiterStore interface — swap with Redis later ────────
-interface IRateLimiterStore {
-    get(key: string): { count: number; resetTime: number } | undefined;
-    set(key: string, record: { count: number; resetTime: number }): void;
-    delete(key: string): void;
-    entries(): IterableIterator<[string, { count: number; resetTime: number }]>;
-}
-
-class MemoryStore implements IRateLimiterStore {
-    private map = new Map<string, { count: number; resetTime: number }>();
-    get(key: string) { return this.map.get(key); }
-    set(key: string, record: { count: number; resetTime: number }) { this.map.set(key, record); }
-    delete(key: string) { this.map.delete(key); }
-    entries() { return this.map.entries(); }
-}
-
-// ── Singleton store ────────────────────────────────────────────
-// Replace `new MemoryStore()` with `new RedisStore(redisClient)` when scaling.
-const store: IRateLimiterStore = new MemoryStore();
-
-// Periodic cleanup of expired entries to prevent memory growth
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, record] of store.entries()) {
-        if (now > record.resetTime) store.delete(key);
-    }
-}, RATE_LIMIT_WINDOW_MS);
+// ── Singleton store (MemoryStore or RedisStore via env) ────────
+const store: IRateLimiterStore = createStore();
 
 // ── Helpers ───────────────────────────────────────────────────
 function extractIp(req: Request): string {
     const forwarded = req.headers["x-forwarded-for"];
     if (typeof forwarded === "string") {
-        // Take only the first IP from a comma-separated list
         return forwarded.split(",")[0].trim();
     }
     return req.ip || "unknown";
@@ -64,17 +40,17 @@ function getRouteConfig(req: Request): { max: number; windowMs: number } {
 
 // ── Middleware factory ─────────────────────────────────────────
 export function createRateLimiter(overrideConfig?: { max: number; windowMs: number }) {
-    return function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+    return async function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
         const ip = extractIp(req);
-        const routeKey = req.baseUrl || req.path; // e.g. "/api/chat"
+        const routeKey = req.baseUrl || req.path;
         const config = overrideConfig ?? getRouteConfig(req);
         const storeKey = `${ip}:${routeKey}`;
         const now = Date.now();
 
-        const record = store.get(storeKey);
+        const record = await store.get(storeKey);
 
         if (!record || now > record.resetTime) {
-            store.set(storeKey, { count: 1, resetTime: now + config.windowMs });
+            await store.set(storeKey, { count: 1, resetTime: now + config.windowMs });
             return next();
         }
 
@@ -90,6 +66,7 @@ export function createRateLimiter(overrideConfig?: { max: number; windowMs: numb
         }
 
         record.count++;
+        await store.set(storeKey, record);
         next();
     };
 }
@@ -103,3 +80,9 @@ export const chatRateLimiter = createRateLimiter(CONFIGS["/api/chat"]);
 
 /** Relaxed rate limiter for analytics — 50 req/min */
 export const analyticsRateLimiter = createRateLimiter(CONFIGS["/api/analytics"]);
+
+/** Strict rate limiter for auth OTP endpoints — 5 req/min */
+export const authRateLimiter = createRateLimiter(CONFIGS["/api/auth"]);
+
+/** Strict rate limiter for admin — 5 req/min */
+export const adminRateLimiter = createRateLimiter(CONFIGS["/api/admin"]);

@@ -1,14 +1,11 @@
 // ===== JanSathi AI — Intent Router Service =====
 // Detects user intent via keyword matching + LLM fallback.
-// Extracted from routes/chat.ts for testability and reuse.
+// LLM fallback uses AIService.classifyIntent() for retry and observability.
 
-import Groq from "groq-sdk";
 import { LLM, VALIDATION, type ModeName } from "../config/env";
-import { INTENT_ROUTER_PROMPT } from "../config/prompts";
 import { type IntentResult } from "../utils/types";
+import { aiService } from "../orchestration/AIService";
 import logger from "../utils/logger";
-
-const groq = new Groq({ apiKey: LLM.apiKey || "" });
 
 // ── Keyword Map ─────────────────────────────────────────────
 const KEYWORD_MAP: Record<string, ModeName> = {
@@ -48,26 +45,17 @@ export async function detectIntent(message: string): Promise<IntentResult> {
         }
     }
 
-    // Phase 2: LLM-based classification (if available)
+    // Phase 2: LLM-based classification (via AIService — gets retry + observability)
     if (LLM.isAvailable) {
         try {
-            const response = await groq.chat.completions.create({
-                model: LLM.model,
-                messages: [
-                    { role: "system", content: INTENT_ROUTER_PROMPT },
-                    { role: "user", content: message },
-                ],
-                temperature: LLM.intentTemperature,
-                max_completion_tokens: LLM.intentMaxTokens,
-                response_format: { type: "json_object" },
-            });
+            const result = await aiService.classifyIntent(message);
 
-            const result = JSON.parse(response.choices[0]?.message?.content || "{}");
-            if (result.module && VALIDATION.allowedModes.includes(result.module as ModeName)) {
+            const parsed = JSON.parse(result.content || "{}");
+            if (parsed.module && VALIDATION.allowedModes.includes(parsed.module as ModeName)) {
                 return {
-                    module: result.module as ModeName,
-                    confidence: typeof result.confidence === "number" ? result.confidence : 0.8,
-                    intent: result.intent || "llm_detected",
+                    module: parsed.module as ModeName,
+                    confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0.8,
+                    intent: parsed.intent || "llm_detected",
                 };
             }
         } catch (error) {

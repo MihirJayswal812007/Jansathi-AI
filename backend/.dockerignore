@@ -1,0 +1,13 @@
+node_modules
+dist
+.env
+.env.*
+tests
+*.test.ts
+vitest.config.ts
+test-output.txt
+test-result.json
+.git
+.gitignore
+README.md
+*.md

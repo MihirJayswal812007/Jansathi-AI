@@ -1,21 +1,20 @@
-// ===== JanSathi AI — Chat Service (Orchestrator) =====
-// The central brain. Wires intent → module → LLM → persistence.
-// Routes call this; it knows nothing about HTTP.
+// ===== JanSathi AI — Chat Service =====
+// Wires intent → module → AIService → persistence.
+// Pure business logic — no HTTP concerns. Session resolved by route layer.
 
-import { Request } from "express";
 import { type ModeName } from "../config/env";
 import { type ChatRequest, type ChatResponse } from "../utils/types";
+import { type SessionData } from "../utils/types";
 import logger from "../utils/logger";
 import { detectIntent } from "./intent.service";
-import { generateResponse } from "./llm.service";
-import { buildContext } from "../modules";
-import { resolveSession, setSessionCookie } from "../middleware/auth";
+import { aiService } from "../orchestration/AIService";
+import { userService } from "./user.service";
 import {
     createConversation,
     addMessage,
     findActiveConversation,
-    trackEvent,
 } from "./conversation";
+import { trackEvent } from "./analytics.service";
 
 export interface ChatHandleResult {
     response: ChatResponse;
@@ -25,17 +24,16 @@ export interface ChatHandleResult {
 /**
  * Handle a chat message end-to-end.
  * Pure business logic — no HTTP concerns.
+ * Session is resolved by the route layer and passed in.
  */
 export async function handleChat(
-    req: Request,
-    body: ChatRequest
+    session: SessionData,
+    body: ChatRequest,
+    isNewSession: boolean
 ): Promise<ChatHandleResult> {
     const { message, mode, conversationHistory = [], language = "hi" } = body;
 
-    // 1. Resolve session
-    const { session, isNew: isNewSession } = await resolveSession(req);
-
-    // 2. Intent detection
+    // 1. Intent detection
     const detected = await detectIntent(message);
     let activeMode: ModeName;
     let confidence: number;
@@ -51,7 +49,7 @@ export async function handleChat(
         activeMode = detected.module; confidence = detected.confidence; intent = detected.intent;
     }
 
-    // 3. Resolve or create conversation
+    // 2. Resolve or create conversation
     let conversationId = body.conversationId || null;
     if (!conversationId && session.userId) {
         conversationId = await findActiveConversation(session.userId, activeMode);
@@ -64,34 +62,40 @@ export async function handleChat(
         });
     }
 
-    // 4. Persist user message
+    // 3. Persist user message
     await addMessage({ conversationId, role: "user", content: message, intent, confidence });
 
-    // 5. Build module-specific context
-    const context = await buildContext(activeMode, message);
-
-    // 6. Call LLM
-    const llmResult = await generateResponse({
-        mode: activeMode,
-        context,
+    // 4. Call AI orchestration (retry, tools, validation, observability — all handled)
+    const aiResult = await aiService.process({
         message,
-        conversationHistory,
+        mode: activeMode,
         language,
+        conversationHistory: conversationHistory.map((msg) => ({
+            role: msg.role as "user" | "assistant",
+            content: msg.content,
+        })),
+        channel: "web",
+        requestId: conversationId,
     });
 
-    // 7. Persist AI response
+    // 5. Persist AI response
     await addMessage({
         conversationId,
         role: "assistant",
-        content: llmResult.content,
-        responseTimeMs: llmResult.durationMs,
+        content: aiResult.content,
+        responseTimeMs: aiResult.durationMs,
     });
 
-    // 8. Track analytics (fire-and-forget)
+    // 6. Update lastActiveAt (fire-and-forget — never blocks response)
+    if (session.userId) {
+        userService.updateLastActive(session.userId);
+    }
+
+    // 7. Track analytics (fire-and-forget)
     trackEvent(
         "message_sent",
         session.id,
-        { intent, confidence, mode: activeMode, responseTimeMs: llmResult.durationMs },
+        { intent, confidence, mode: activeMode, responseTimeMs: aiResult.durationMs },
         session.userId,
         activeMode
     );
@@ -99,13 +103,14 @@ export async function handleChat(
     logger.info("chat.completed", {
         mode: activeMode,
         intent,
-        llmDurationMs: llmResult.durationMs,
-        isDemo: llmResult.isDemo,
+        llmDurationMs: aiResult.durationMs,
+        isDemo: aiResult.isDemo,
+        toolsUsed: aiResult.toolsUsed,
     });
 
     return {
         response: {
-            content: llmResult.content,
+            content: aiResult.content,
             mode: activeMode,
             confidence,
             intent,

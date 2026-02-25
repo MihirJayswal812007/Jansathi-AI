@@ -6,7 +6,7 @@ import { Router, Request, Response } from "express";
 import { rateLimitMiddleware } from "../middleware/rateLimiter";
 import { validateChatInput } from "../middleware/validator";
 import { sendError } from "../middleware/errorHandler";
-import { setSessionCookie } from "../middleware/auth";
+import { resolveSession, setSessionCookie } from "../middleware/auth";
 import { handleChat } from "../services/chat.service";
 import { type ChatRequest } from "../utils/types";
 import logger from "../utils/logger";
@@ -27,7 +27,11 @@ chatRouter.post("/", async (req: Request, res: Response) => {
         });
         if (validationError) return sendError(res, "INVALID_INPUT", validationError, requestId);
 
-        const result = await handleChat(req, body);
+        // Resolve session at HTTP layer — service receives pure data
+        const { session, isNew } = await resolveSession(req);
+        if (isNew) setSessionCookie(res, session.token);
+
+        const result = await handleChat(session, body, isNew);
 
         if (result.sessionToken) setSessionCookie(res, result.sessionToken);
 

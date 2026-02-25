@@ -5,14 +5,15 @@ import { rateLimitMiddleware } from "../middleware/rateLimiter";
 import { validateAnalyticsInput } from "../middleware/validator";
 import { sendError } from "../middleware/errorHandler";
 import { getSession } from "../middleware/auth";
-import { trackEvent } from "../services/conversation";
+import { authMiddleware } from "../middleware/rbac";
+import { trackEvent } from "../services/analytics.service";
 import logger from "../utils/logger";
 
 export const analyticsRouter = Router();
 
 analyticsRouter.use(rateLimitMiddleware);
 
-analyticsRouter.post("/", async (req: Request, res: Response) => {
+analyticsRouter.post("/", authMiddleware, async (req: Request, res: Response) => {
     const requestId = logger.generateRequestId();
 
     try {

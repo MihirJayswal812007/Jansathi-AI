@@ -14,7 +14,7 @@ datasource db {
 // ── Session Model ───────────────────────────────────────────
 model Session {
   id        String  @id @default(cuid())
-  token     String  @unique @default(cuid())
+  token     String  @unique  // Generated via crypto.randomBytes in createSession()
   userId    String?
   role      String  @default("user") // "user" | "admin"
   language  String  @default("hi")
@@ -36,7 +36,9 @@ model Session {
 model User {
   id       String  @id @default(cuid())
   phone    String? @unique
+  email    String? @unique
   name     String?
+  role     String  @default("user") // "user" | "admin"
   language String  @default("hi") // "hi" | "en"
 
   // Location
@@ -128,4 +130,41 @@ model AnalyticsEvent {
   @@index([userId])
   @@index([timestamp])
   @@map("analytics_events")
+}
+
+// ── OTP Verification Model ─────────────────────────────────
+model OtpVerification {
+  id         String   @id @default(cuid())
+  identifier String   // phone number or email
+  otpHash    String   // SHA-256 hash — NEVER store plain text
+  expiresAt  DateTime
+  verified   Boolean  @default(false)
+  attempts   Int      @default(0) // brute-force tracking
+
+  createdAt  DateTime @default(now())
+
+  @@index([identifier, expiresAt])
+  @@index([identifier, createdAt])
+  @@map("otp_verifications")
+}
+
+// ── Daily Snapshot Model (pre-aggregated analytics) ─────────
+model DailySnapshot {
+  id                 String   @id @default(cuid())
+  date               DateTime @unique // The day this snapshot covers (midnight UTC)
+  totalUsers         Int      @default(0)
+  activeUsers        Int      @default(0)
+  totalConversations Int      @default(0)
+  newConversations   Int      @default(0)
+  avgResponseTimeMs  Int      @default(0)
+  satisfactionAvg    Float    @default(0)
+  resolvedRate       Int      @default(0) // percentage 0-100
+  moduleUsage        Json     @default("{}")
+  languageSplit      Json     @default("{}")
+  topIntents         Json     @default("[]")
+
+  computedAt DateTime @default(now())
+
+  @@index([date])
+  @@map("daily_snapshots")
 }
