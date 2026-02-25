@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JanSathi AI - Career &amp; Commerce Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d97008",
+                        "accent-red": "#DC2626",
+                        "accent-orange": "#D97706",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0F172A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-hover:hover {
+            background: rgba(51, 65, 85, 0.8);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-sans text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-800 bg-background-dark/80 backdrop-blur-md px-8 py-4">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-2 rounded-lg">
+<span class="material-symbols-outlined text-white">smart_toy</span>
+</div>
+<h2 class="font-display text-xl font-bold tracking-tight">JanSathi AI</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">JanKaushal</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">JanVyapar</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Resources</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="bg-slate-800/50 border-slate-700 rounded-full pl-10 pr-4 py-2 text-sm focus:ring-primary focus:border-primary w-64" placeholder="Search insights..." type="text"/>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-800 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="h-10 w-10 rounded-full border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHQrdpfSMoVtVC_DRnkL9IXtyKXnVdrQzviMC4vbi_8qunDoWa4RiPZrjxC2d1ci2keKbI1djHX_SybFf4xsKEWE9sUIjUhltrFLSuw790CFtxjUuksxTL61kdKlVqYKlQYeKVY3J1XoeeXK0cr8uBgBOAnPNCxsv1hReJ0uIuqmfS0dMElAJIR7qLMk_FF43-WRjGoU7BoVvMLiE4WlbQSDVXU-UnG29ZgCCTn3kodgllj2dbbXVuhp3rdnJyQ62PtZmwXRJ9ddXR"/>
+</div>
+</div>
+</header>
+<main class="flex-1 p-6 lg:p-10">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+<div>
+<h1 class="font-display text-3xl font-bold">Namaste, Rajesh</h1>
+<p class="text-slate-400 mt-1">Here is what's happening with your career and business today.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined">bolt</span>
+                        Ask JanSathi AI
+                    </button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<section class="space-y-6">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-accent-red">school</span>
+<h3 class="font-display text-xl font-bold">JanKaushal <span class="text-sm font-normal text-slate-400 ml-2">Career &amp; Skills</span></h3>
+</div>
+<div class="glass rounded-xl p-6 border-t-4 border-t-accent-red">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-bold">Resume Builder</h4>
+<span class="bg-accent-red/20 text-accent-red text-xs font-bold px-2 py-1 rounded">75% Complete</span>
+</div>
+<div class="mb-4">
+<div class="flex justify-between text-xs text-slate-400 mb-2 px-1">
+<span>Personal</span>
+<span>Education</span>
+<span>Skills</span>
+<span class="text-slate-600">Done</span>
+</div>
+<div class="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-accent-red w-3/4 rounded-full"></div>
+</div>
+</div>
+<p class="text-sm text-slate-400 mb-4">Select your primary trade to autofill skills:</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+<div class="glass-hover border border-slate-700 p-3 rounded-lg flex flex-col items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-accent-red">directions_car</span>
+<div class="text-center">
+<div class="text-xs font-bold">Driver</div>
+<div class="text-[10px] text-slate-400">चालक</div>
+</div>
+</div>
+<div class="glass-hover border border-accent-red/50 bg-accent-red/5 p-3 rounded-lg flex flex-col items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-accent-red">bolt</span>
+<div class="text-center">
+<div class="text-xs font-bold">Electrician</div>
+<div class="text-[10px] text-slate-400">बिजली मिस्त्री</div>
+</div>
+</div>
+<div class="glass-hover border border-slate-700 p-3 rounded-lg flex flex-col items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-accent-red">content_cut</span>
+<div class="text-center">
+<div class="text-xs font-bold">Tailor</div>
+<div class="text-[10px] text-slate-400">दर्जी</div>
+</div>
+</div>
+<div class="glass-hover border border-slate-700 p-3 rounded-lg flex flex-col items-center gap-2 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-accent-red">keyboard</span>
+<div class="text-center">
+<div class="text-xs font-bold">Data Entry</div>
+<div class="text-[10px] text-slate-400">डाटा एंट्री</div>
+</div>
+</div>
+</div>
+</div>
+<div class="glass rounded-xl p-6 border-t-4 border-t-accent-red">
+<h4 class="font-bold mb-4">Career Compass</h4>
+<div class="relative mb-4">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">explore</span>
+<input class="w-full bg-slate-800/40 border-slate-700 rounded-lg pl-10 py-2 text-sm" placeholder="I want to be a..." type="text"/>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+<div class="min-w-[200px] h-28 rounded-xl p-4 flex flex-col justify-end bg-gradient-to-br from-indigo-600 to-accent-red relative overflow-hidden group cursor-pointer shrink-0">
+<span class="material-symbols-outlined absolute -top-2 -right-2 text-6xl opacity-20 group-hover:scale-110 transition-transform">campaign</span>
+<div class="relative z-10">
+<p class="text-xs text-white/80">Trending</p>
+<h5 class="font-bold text-white">Digital Marketing</h5>
+</div>
+</div>
+<div class="min-w-[200px] h-28 rounded-xl p-4 flex flex-col justify-end bg-gradient-to-br from-amber-500 to-orange-700 relative overflow-hidden group cursor-pointer shrink-0">
+<span class="material-symbols-outlined absolute -top-2 -right-2 text-6xl opacity-20 group-hover:scale-110 transition-transform">solar_power</span>
+<div class="relative z-10">
+<p class="text-xs text-white/80">High Demand</p>
+<h5 class="font-bold text-white">Solar Technician</h5>
+</div>
+</div>
+</div>
+</div>
+<div class="glass rounded-xl p-6 border-t-4 border-t-accent-red">
+<h4 class="font-bold mb-4">AI Interview Coach</h4>
+<div class="bg-slate-800/60 rounded-lg p-4 mb-4 flex gap-3 items-start border-l-4 border-accent-red">
+<div class="w-8 h-8 rounded-full bg-accent-red flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-sm">face</span>
+</div>
+<p class="text-sm italic">"Namaste! Let's practice. Can you please tell me a bit about yourself and your work experience?"</p>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded-md text-xs font-medium border border-slate-700 hover:bg-slate-700">Easy</button>
+<button class="px-3 py-1 rounded-md text-xs font-medium bg-accent-red/20 text-accent-red border border-accent-red/30">Medium</button>
+<button class="px-3 py-1 rounded-md text-xs font-medium border border-slate-700 hover:bg-slate-700">Hard</button>
+</div>
+<button class="bg-accent-red text-white p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+</div>
+</section>
+<section class="space-y-6">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-accent-orange">storefront</span>
+<h3 class="font-display text-xl font-bold">JanVyapar <span class="text-sm font-normal text-slate-400 ml-2">Business &amp; Commerce</span></h3>
+</div>
+<div class="glass rounded-xl p-6 border-t-4 border-t-accent-orange">
+<div class="flex justify-between items-start mb-4">
+<h4 class="font-bold">Product Showcase</h4>
+<button class="text-accent-orange text-xs font-bold hover:underline">Manage Catalog</button>
+</div>
+<div class="bg-slate-800/40 rounded-xl overflow-hidden border border-slate-700 group">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close up of traditional handmade Indian pickles in a glass jar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-1Xbb6u3fMosOOuyMZ6WARpZkvMw65EFv9ipu3FxxbK7WG9ej7PyNWvtIPcvRhEhbC44dEBLfuwSRvPZ1Cu1aYm3ZsiqchL3-vh0Mv0icGkSrAdJiinUHi-msVitA7uvt0tst0Bj61jYxu_tuiPpMJXvWwFGekkSSoVnXoeX1JzECm1VL7qS1Q40Og_A4aQEn3_HVUoufoFRI9C3eUd5QWaEbIG-NtGftg3OTDz3teKzoHXyeKjKyevlWIRTy0qm2t33r3A4Sn9em"/>
+<div class="absolute top-2 right-2 bg-background-dark/80 backdrop-blur px-2 py-1 rounded text-xs font-bold text-accent-orange">
+                                        ₹250
+                                    </div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-center mb-2">
+<h5 class="font-bold">Organic Handmade Mango Pickle</h5>
+<div class="flex items-center gap-1 text-amber-400">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold">4.5</span>
+</div>
+</div>
+<p class="text-xs text-slate-400 mb-4">Traditional home-style recipe with organic spices. 500g pack.</p>
+<div class="flex gap-2">
+<button class="flex-1 bg-accent-orange hover:bg-accent-orange/90 text-white py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span> Order Now
+                                        </button>
+<button class="p-2 border border-slate-700 rounded-lg hover:bg-slate-700 text-slate-300">
+<span class="material-symbols-outlined text-sm">share</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="glass rounded-xl p-6 border-t-4 border-t-accent-orange">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-bold">Sarkari Scheme Finder</h4>
+<span class="material-symbols-outlined text-slate-500">info</span>
+</div>
+<div class="bg-accent-orange/10 border border-accent-orange/20 rounded-xl p-5 mb-4">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h5 class="font-bold text-slate-100">PM Kisan Samman Nidhi</h5>
+<p class="text-[10px] text-slate-400 uppercase tracking-wider">Direct Benefit Transfer</p>
+</div>
+<div class="flex items-center gap-1 bg-green-500/20 text-green-400 px-2 py-1 rounded text-[10px] font-bold">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> ELIGIBLE
+                                    </div>
+</div>
+<div class="space-y-2 mb-4">
+<p class="text-xs font-medium text-slate-300">Documents Checklist:</p>
+<div class="grid grid-cols-2 gap-2">
+<div class="flex items-center gap-2 text-[10px] text-slate-400">
+<span class="material-symbols-outlined text-green-500 text-sm">check</span> Aadhaar Card
+                                        </div>
+<div class="flex items-center gap-2 text-[10px] text-slate-400">
+<span class="material-symbols-outlined text-green-500 text-sm">check</span> Land Records
+                                        </div>
+<div class="flex items-center gap-2 text-[10px] text-slate-400">
+<span class="material-symbols-outlined text-green-500 text-sm">check</span> Bank Passbook
+                                        </div>
+<div class="flex items-center gap-2 text-[10px] text-slate-500">
+<span class="material-symbols-outlined text-slate-600 text-sm">pending</span> Mobile OTP
+                                        </div>
+</div>
+</div>
+<button class="w-full bg-slate-100 text-background-dark hover:bg-white py-2 rounded-lg text-sm font-bold transition-colors">
+                                    Apply Now
+                                </button>
+</div>
+<p class="text-[10px] text-slate-500 text-center">Last updated: 2 hours ago from official portal</p>
+</div>
+<div class="glass rounded-xl p-6 border-t-4 border-t-accent-orange">
+<div class="flex items-center justify-between mb-4">
+<h4 class="font-bold">Business Growth Insights</h4>
+<span class="material-symbols-outlined text-accent-orange">trending_up</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-accent-orange">analytics</span>
+</div>
+<div class="flex-1">
+<p class="text-xs text-slate-400">Search Trend</p>
+<p class="text-sm font-medium">Pickle demand is up 24% in your region this month.</p>
+</div>
+</div>
+<div class="h-px bg-slate-700 w-full"></div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-accent-orange">campaign</span>
+</div>
+<div class="flex-1">
+<p class="text-xs text-slate-400">Marketing Tip</p>
+<p class="text-sm font-medium">Add "Organic" tags to your listing to attract more buyers.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<footer class="mt-auto border-t border-slate-800 p-8 text-center text-slate-500 text-xs">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<p>© 2024 JanSathi AI. Empowering Bharat through Technology.</p>
+<div class="flex gap-6">
+<a class="hover:text-slate-300" href="#">Privacy Policy</a>
+<a class="hover:text-slate-300" href="#">Terms of Service</a>
+<a class="hover:text-slate-300" href="#">Help Center</a>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

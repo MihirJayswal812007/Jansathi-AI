@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ── Session Model ───────────────────────────────────────────
+model Session {
+  id        String  @id @default(cuid())
+  token     String  @unique @default(cuid())
+  userId    String?
+  role      String  @default("user") // "user" | "admin"
+  language  String  @default("hi")
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ── User Model ──────────────────────────────────────────────
+model User {
+  id       String  @id @default(cuid())
+  phone    String? @unique
+  name     String?
+  language String  @default("hi") // "hi" | "en"
+
+  // Location
+  village  String?
+  district String?
+  state    String?
+  pincode  String?
+
+  // Demographics
+  age        Int?
+  gender     String? // "male" | "female" | "other"
+  category   String? // "General" | "SC" | "ST" | "OBC" | "Minority"
+  income     Int?
+  occupation String?
+
+  // Preferences
+  favoriteModules String[] @default([])
+  voiceEnabled    Boolean  @default(true)
+  fontSize        String   @default("normal")
+
+  // Timestamps
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  // Relations
+  sessions      Session[]
+  conversations Conversation[]
+  analytics     AnalyticsEvent[]
+
+  @@map("users")
+}
+
+// ── Conversation Model ──────────────────────────────────────
+model Conversation {
+  id           String  @id @default(cuid())
+  userId       String?
+  mode         String // "janseva" | "janshiksha" | "jankrishi" | "janvyapar" | "jankaushal"
+  satisfaction Int? // 1-5 rating
+  resolved     Boolean @default(false)
+
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  // Relations
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  messages Message[]
+
+  @@index([userId])
+  @@index([mode])
+  // Composite index for findActiveConversation: WHERE userId + mode + endedAt IS NULL + startedAt
+  @@index([userId, mode, endedAt, startedAt(sort: Desc)])
+  @@map("conversations")
+}
+
+// ── Message Model ───────────────────────────────────────────
+model Message {
+  id             String  @id @default(cuid())
+  conversationId String
+  role           String // "user" | "assistant" | "system"
+  content        String
+  intent         String?
+  confidence     Float?
+  responseTimeMs Int?
+
+  timestamp DateTime @default(now())
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+// ── Analytics Event Model ───────────────────────────────────
+model AnalyticsEvent {
+  id        String  @id @default(cuid())
+  type      String // "page_view" | "mode_select" | "voice_start" | etc.
+  userId    String?
+  mode      String?
+  metadata  Json    @default("{}")
+  sessionId String
+
+  timestamp DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("analytics_events")
+}

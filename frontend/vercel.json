@@ -1,0 +1,41 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "regions": [
+        "bom1"
+    ],
+    "functions": {
+        "src/app/api/chat/route.ts": {
+            "maxDuration": 30
+        },
+        "src/app/api/weather/route.ts": {
+            "maxDuration": 10
+        },
+        "src/app/api/mandi/route.ts": {
+            "maxDuration": 10
+        }
+    },
+    "headers": [
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-store, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/sw.js",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache, no-store, must-revalidate"
+                },
+                {
+                    "key": "Service-Worker-Allowed",
+                    "value": "/"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JanSathi AI Multi-Module Widget Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&amp;family=Inter:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#089166",
+                        "education": "#7C3AED",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#0F172A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-sans text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-background-light dark:bg-background-dark/50">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div>
+<h1 class="font-display font-bold text-lg leading-none">JanSathi AI</h1>
+<span class="text-xs text-slate-500 font-medium">Premium Dashboard</span>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">potted_plant</span>
+<span class="font-medium text-sm">JanKrishi</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-medium text-sm">JanShiksha</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-medium text-sm">Analytics</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium text-sm">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="h-20 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-background-light/50 dark:bg-background-dark/50 backdrop-blur-md z-10">
+<div class="flex flex-col">
+<h2 class="font-display text-xl font-bold">Multi-Module Widget Dashboard</h2>
+<p class="text-sm text-slate-500">Welcome back, JanSathi User</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-primary/50" placeholder="Search insights..." type="text"/>
+</div>
+<button class="size-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-10 rounded-full overflow-hidden bg-primary/20 border-2 border-primary">
+<img alt="Profile" data-alt="User avatar placeholder with abstract geometric shapes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA185eJWquP4UE5X4c1o1d92IUuuQ0Rp6Fey_S_uRX7SPGZhrPbBQYCo02xeooNWt04GPJSnhJxQIgV-t6xdAgFjfvIZLlbrz5iCu3TvALVzSWMqndBARcuxXwUK84Q5cmHBBFjaqkJnxJRRDzDWpBymjAFjimZaqTo--NHl_vCt2J0QJDRrLc7rYyc7FC6ff_FtjNXXa0W8N8bu2eUuKKyWEaUlCSkQFJIcBQVZyHmGpI2lyWcAAL5hQLaJnJ3lB85r3UYJvVQvsVd"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Grid -->
+<div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+<div class="grid grid-cols-12 gap-6">
+<!-- LEFT COLUMN (JanKrishi) -->
+<div class="col-span-12 lg:col-span-6 space-y-6">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary">eco</span>
+<h3 class="font-display font-bold text-primary tracking-wide uppercase text-sm">JanKrishi Agriculture</h3>
+</div>
+<!-- Weather Widget -->
+<div class="glass-card rounded-xl p-6 relative overflow-hidden border-t-4 border-t-primary">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<button class="px-3 py-1 rounded-full bg-primary text-white text-xs font-bold">Lucknow</button>
+<button class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-medium">Kanpur</button>
+<button class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-medium">Delhi</button>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-5xl font-display font-bold">32°C</span>
+<span class="text-slate-400 mb-1">Partly Cloudy</span>
+</div>
+<p class="text-sm text-slate-500 mt-1">65% Humidity • Wind 12km/h</p>
+</div>
+<span class="material-symbols-outlined text-6xl text-yellow-500">wb_sunny</span>
+</div>
+<div class="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-slate-800">
+<div class="text-center">
+<p class="text-xs text-slate-500 uppercase">Mon</p>
+<span class="material-symbols-outlined text-primary my-1">sunny</span>
+<p class="font-bold">34°</p>
+</div>
+<div class="text-center">
+<p class="text-xs text-slate-500 uppercase">Tue</p>
+<span class="material-symbols-outlined text-slate-400 my-1">cloud</span>
+<p class="font-bold">31°</p>
+</div>
+<div class="text-center">
+<p class="text-xs text-slate-500 uppercase">Wed</p>
+<span class="material-symbols-outlined text-blue-400 my-1">rainy</span>
+<p class="font-bold">28°</p>
+</div>
+</div>
+</div>
+<!-- Mandi Prices Widget -->
+<div class="glass-card rounded-xl p-6 border-t-4 border-t-primary">
+<h4 class="font-display font-bold text-lg mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                                Mandi Prices
+                            </h4>
+<div class="overflow-hidden">
+<table class="w-full text-left text-sm">
+<thead>
+<tr class="text-slate-500 border-b border-slate-800">
+<th class="pb-3 font-medium">Commodity</th>
+<th class="pb-3 font-medium">Price (q)</th>
+<th class="pb-3 font-medium text-right">Trend</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-800">
+<tr>
+<td class="py-4 font-medium">Wheat (Kanak)</td>
+<td class="py-4">₹2,125</td>
+<td class="py-4 text-right text-emerald-500 flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> 2.4%
+                                            </td>
+</tr>
+<tr>
+<td class="py-4 font-medium">Rice (Basmati)</td>
+<td class="py-4">₹4,450</td>
+<td class="py-4 text-right text-rose-500 flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-sm">trending_down</span> 0.8%
+                                            </td>
+</tr>
+<tr>
+<td class="py-4 font-medium">Tomato (Desi)</td>
+<td class="py-4">₹1,800</td>
+<td class="py-4 text-right text-emerald-500 flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> 12.1%
+                                            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Crop Diagnosis Widget -->
+<div class="glass-card rounded-xl p-6 border-t-4 border-t-primary">
+<div class="flex gap-4">
+<div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0 border border-slate-700" data-alt="Microscopic view of wheat leaf rust disease" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBbd6gzU-OBjuhGOejfvk4mUBTMXyC8KCV0WuNDtW0oe4EoGTFb2DidVAcjoHwK85vHqraT51egUfe7hiyQmGSgb_XuMg0NflFetaQMtvl7FWhUyw3m5D-CQowvNrM1iPy_jVrAVWXuKGFRR45LIml5ivi8-w6fWFMePoHcyl6QbY0Xl_XOrOHHHR1mU9WAPnlSjF10JwmmSu0rpgOOlL0SAZwxjwkXQpG44orPdzFMiVbSGdPurEF-QzAYPcdwVau0aplwR5Hf4w7y')"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-display font-bold">Crop Diagnosis</h4>
+<span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase">In Progress</span>
+</div>
+<p class="text-sm font-medium mb-1">Detected: <span class="text-yellow-500">Leaf Rust</span></p>
+<div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-yellow-500 h-full w-[60%]"></div>
+</div>
+<p class="text-[11px] text-slate-500 mt-2">60% Severity • Immediate treatment recommended</p>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (JanShiksha) -->
+<div class="col-span-12 lg:col-span-6 space-y-6">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-education">auto_stories</span>
+<h3 class="font-display font-bold text-education tracking-wide uppercase text-sm">JanShiksha Education</h3>
+</div>
+<!-- Concept Explainer -->
+<div class="glass-card rounded-xl p-6 border-t-4 border-t-education">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-display font-bold text-lg">Concept Explainer</h4>
+<div class="flex bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1 rounded text-xs font-bold bg-education text-white">Class 5</button>
+<button class="px-3 py-1 rounded text-xs font-medium text-slate-400">Class 6</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="p-4 rounded-xl border border-slate-800 bg-slate-800/50 hover:border-education transition-all text-left group">
+<div class="size-8 rounded-lg bg-green-500/20 text-green-500 flex items-center justify-center mb-3 group-hover:bg-education group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">psychology</span>
+</div>
+<p class="font-bold text-sm">Photosynthesis</p>
+<p class="text-[10px] text-slate-500 mt-1">Science • Ch 4</p>
+</button>
+<button class="p-4 rounded-xl border border-slate-800 bg-slate-800/50 hover:border-education transition-all text-left group">
+<div class="size-8 rounded-lg bg-blue-500/20 text-blue-500 flex items-center justify-center mb-3 group-hover:bg-education group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">rocket_launch</span>
+</div>
+<p class="font-bold text-sm">Gravity</p>
+<p class="text-[10px] text-slate-500 mt-1">Physics • Ch 2</p>
+</button>
+<button class="p-4 rounded-xl border border-slate-800 bg-slate-800/50 hover:border-education transition-all text-left group">
+<div class="size-8 rounded-lg bg-cyan-500/20 text-cyan-500 flex items-center justify-center mb-3 group-hover:bg-education group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">water_drop</span>
+</div>
+<p class="font-bold text-sm">Water Cycle</p>
+<p class="text-[10px] text-slate-500 mt-1">Geography • Ch 7</p>
+</button>
+<button class="p-4 rounded-xl border border-slate-800 bg-slate-800/50 hover:border-education transition-all text-left group">
+<div class="size-8 rounded-lg bg-rose-500/20 text-rose-500 flex items-center justify-center mb-3 group-hover:bg-education group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">functions</span>
+</div>
+<p class="font-bold text-sm">Fractions</p>
+<p class="text-[10px] text-slate-500 mt-1">Maths • Ch 1</p>
+</button>
+</div>
+</div>
+<!-- Quiz Bot Card -->
+<div class="glass-card rounded-xl p-6 border-t-4 border-t-education relative">
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded bg-education flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xs">quiz</span>
+</div>
+<h4 class="font-display font-bold">Quiz Bot</h4>
+</div>
+<span class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Question 2 of 5</span>
+</div>
+<div class="w-full bg-slate-800 h-1 rounded-full mb-6">
+<div class="bg-education h-full w-[40%] rounded-full"></div>
+</div>
+<p class="text-base font-medium mb-6 leading-relaxed">
+                                Which part of the plant is primarily responsible for absorbing sunlight during photosynthesis?
+                            </p>
+<div class="space-y-3">
+<button class="w-full p-4 rounded-xl border border-slate-800 text-left hover:bg-education/10 hover:border-education transition-all flex items-center justify-between group">
+<span class="font-medium">A. Roots</span>
+<div class="size-5 rounded-full border border-slate-700 group-hover:border-education"></div>
+</button>
+<button class="w-full p-4 rounded-xl border border-education bg-education/5 text-left flex items-center justify-between">
+<span class="font-medium text-education">B. Leaves</span>
+<div class="size-5 rounded-full bg-education flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[10px] font-bold">check</span>
+</div>
+</button>
+<button class="w-full p-4 rounded-xl border border-slate-800 text-left hover:bg-education/10 hover:border-education transition-all flex items-center justify-between group">
+<span class="font-medium">C. Stem</span>
+<div class="size-5 rounded-full border border-slate-700 group-hover:border-education"></div>
+</button>
+<button class="w-full p-4 rounded-xl border border-slate-800 text-left hover:bg-education/10 hover:border-education transition-all flex items-center justify-between group">
+<span class="font-medium">D. Flower</span>
+<div class="size-5 rounded-full border border-slate-700 group-hover:border-education"></div>
+</button>
+</div>
+<div class="mt-6 flex justify-end">
+<button class="px-6 py-2.5 rounded-lg bg-education text-white font-bold text-sm shadow-lg shadow-education/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                                    Next Question
+                                </button>
+</div>
+</div>
+<!-- Quick Action Card -->
+<div class="bg-gradient-to-r from-education/20 to-primary/20 p-6 rounded-xl border border-white/10 flex items-center justify-between">
+<div>
+<h4 class="font-display font-bold text-lg">Ask JanSathi Anything</h4>
+<p class="text-xs text-slate-400 mt-1">Voice enabled AI assistant for multi-lingual help</p>
+</div>
+<button class="size-12 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JanSathi AI - JanKrishi Mode</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#059467",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#0f231d",
+                        "accent-dark": "#0F172A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .message-gradient {
+            background: linear-gradient(135deg, rgba(5, 148, 103, 0.1) 0%, rgba(15, 23, 42, 0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-accent-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 w-full border-b border-white/10 bg-accent-dark/80 backdrop-blur-md px-6 md:px-20 py-4">
+<div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined text-2xl">agriculture</span>
+</div>
+<h2 class="text-xl font-display font-bold tracking-tight text-white hidden sm:block">JanSathi AI</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex bg-primary/20 border border-primary/30 rounded-full px-4 py-1.5 items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+<span class="text-primary font-display font-bold text-sm tracking-wide">JanKrishi Mode</span>
+</div>
+<div class="h-8 w-[1px] bg-white/10 hidden md:block"></div>
+<button class="text-slate-300 hover:text-white transition-colors text-sm font-medium px-3 py-1">हिंदी / EN</button>
+<div class="relative group">
+<div class="w-10 h-10 rounded-full bg-primary/30 border border-primary/50 flex items-center justify-center overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Profile photo of a smiling Indian farmer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWxH3g1F-YjYJvH-_HuqOhgAquyiM1uaah3-77zxVAj5hQHyVSkjtYbma_J6Z_EMaDVxHZb1lH7ofuoVP8zBAZ6KJyWoUtN9zvd28pZE2JWtq88nAVlc_XDjpmYFKGrIynriwQXMhoGMY3vnp24dE4b5Z65eqMTP_dtdtegGHlOGQBI7-FdnsHkGLnxpQYpv1wGQZPNYH6_3nttumSJcInrWH5nDAQ-rrhQeI1ZxjnZ6uRn5OaQP_1zTQK4yGAxlkTGpktMfee-4j3"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Chat Content -->
+<main class="flex-1 w-full max-w-4xl mx-auto px-4 py-8 flex flex-col gap-8 mb-24">
+<!-- User Message -->
+<div class="flex justify-end items-start gap-4">
+<div class="flex flex-col items-end gap-2 max-w-[80%]">
+<span class="text-xs font-display text-slate-400 uppercase tracking-widest">Farmer</span>
+<div class="bg-slate-800/80 border border-slate-700/50 p-4 rounded-2xl rounded-tr-none shadow-xl">
+<p class="text-lg leading-relaxed text-slate-100 font-display">मेरी गेहूं की फसल में पीले धब्बे आ रहे हैं</p>
+</div>
+</div>
+<div class="w-10 h-10 rounded-full bg-slate-700 shrink-0 overflow-hidden border border-slate-600">
+<img alt="Farmer Profile" class="w-full h-full object-cover" data-alt="Indian farmer profile close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnel8p0mk9ITQzS7qh8EDFjrhoUwXFdJ4lsNahuMm9ti2hp7SO47ySQKCbXppSLp_oyOt8MadjsfxN7Wdi7tWbuxnP53P5wUfSsqlsKRnAKdPukSuLNRg48WatQVhe2_6r6TefDgNBiUVo02Mfff_RBQLCwlYdr-hSFamlliRh94Z1va3tygEdFb5YBr2zQ0NVwya97YiL-Pv-9k6qHtVPUoC0lOo1yKShni2QjC5wYDd6bEl-BG2e7g7lnGy_4R4kbhiCH_1_jFJW"/>
+</div>
+</div>
+<!-- AI Response 1 -->
+<div class="flex justify-start items-start gap-4">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-xl">smart_toy</span>
+</div>
+<div class="flex flex-col gap-4 max-w-[85%]">
+<div class="flex items-center gap-2">
+<span class="text-xs font-display text-primary uppercase tracking-widest font-bold">JanSathi AI</span>
+<span class="w-1 h-1 rounded-full bg-slate-600"></span>
+<span class="text-xs text-slate-500">Just now</span>
+</div>
+<div class="glass-card p-6 rounded-2xl rounded-tl-none border-l-[3px] border-l-primary relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl">spa</span>
+</div>
+<p class="text-lg leading-relaxed text-slate-200 mb-4">
+                        आपकी गेहूं की फसल में 'येलो रस्ट' (पीला रतुआ) के लक्षण दिख रहे हैं। कृपया ये कदम उठाएं:
+                    </p>
+<ul class="space-y-3 mb-6">
+<li class="flex items-start gap-3 text-slate-300">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span>संक्रमित पौधों को तुरंत खेत के बाकी हिस्सों से अलग करें।</span>
+</li>
+<li class="flex items-start gap-3 text-slate-300">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span>प्रोपिकोनाज़ोल (25% EC) का 1 मिली/लीटर पानी में घोल बनाकर छिड़काव करें।</span>
+</li>
+<li class="flex items-start gap-3 text-slate-300">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span>अगले 48 घंटों तक सिंचाई को पूरी तरह से नियंत्रित रखें।</span>
+</li>
+</ul>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-full text-primary text-sm font-bold transition-all">
+<span class="material-symbols-outlined">volume_up</span>
+                        Play Audio
+                    </button>
+</div>
+</div>
+</div>
+<!-- Diagnosis Card -->
+<div class="flex justify-start items-start gap-4">
+<div class="w-10 h-10 opacity-0 shrink-0 hidden md:block"></div>
+<div class="flex-1 max-w-2xl">
+<div class="bg-slate-900/60 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+<div class="relative h-48 w-full">
+<img alt="Wheat disease analysis" class="w-full h-full object-cover opacity-60" data-alt="Macro photo of yellow rust on green wheat leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6FTRhWLD3WqdOeKhrsMBBSXlKskywH-yPC0kjRwbobp3V6poNpgKwgSbvm0TjiT7MUW3kDfP2iMO5cdtMeoJ58pwBiEHKRKjhp6FBTwghiMdOuQUkQJ40sIVDOn3Tajr1kwQG64hWPUvlP9MUX1UXtLxFqvOZeZEWzzvW9SLe9U8sgkGwbEjPtC9qkFDyc53-i75nJBOHLCU6Trw82RlyAjp3QDvBryJlVjXP-QEyM00OU68JSgUVfBpYmj9EnRa2IMJPF7Zt8WGx"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-6">
+<span class="px-3 py-1 bg-red-500/20 border border-red-500/50 text-red-400 text-[10px] font-bold uppercase tracking-widest rounded-full">High Severity</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-display font-bold text-white mb-1">Crop Diagnosis: Yellow Rust</h3>
+<p class="text-slate-400 text-sm">Detected in Triticum aestivum (Wheat)</p>
+</div>
+<div class="text-right">
+<div class="text-primary text-2xl font-bold font-display">88%</div>
+<div class="text-[10px] text-slate-500 uppercase font-bold">Confidence</div>
+</div>
+</div>
+<div class="mb-8">
+<div class="flex justify-between mb-2">
+<span class="text-xs text-slate-400 font-medium">Infection Spread</span>
+<span class="text-xs text-slate-400 font-medium">Moderate</span>
+</div>
+<div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[65%] shadow-[0_0_10px_#059467]"></div>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="text-sm font-bold text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">assignment</span> Treatment Steps
+                            </h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 flex gap-3">
+<div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0">1</div>
+<p class="text-xs text-slate-300">Remove yellowed leaves from the lower stem area.</p>
+</div>
+<div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 flex gap-3">
+<div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0">2</div>
+<p class="text-xs text-slate-300">Apply fungicide spray during early morning hours.</p>
+</div>
+<div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 flex gap-3">
+<div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0">3</div>
+<p class="text-xs text-slate-300">Maintain adequate spacing between crop rows.</p>
+</div>
+<div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 flex gap-3">
+<div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0">4</div>
+<p class="text-xs text-slate-300">Check soil pH before next chemical application.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Sticky Input Bar -->
+<div class="fixed bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-accent-dark via-accent-dark/95 to-transparent">
+<div class="max-w-4xl mx-auto flex items-center gap-4">
+<!-- Glowing Microphone -->
+<button class="relative flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-[0_0_20px_rgba(5,148,103,0.4)] group shrink-0 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-3xl">mic</span>
+<span class="absolute inset-0 rounded-full animate-ping bg-primary opacity-20 group-hover:opacity-40"></span>
+</button>
+<!-- Input Field -->
+<div class="flex-1 relative flex items-center">
+<input class="w-full bg-slate-800/80 border border-white/10 rounded-full px-6 py-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all font-body text-lg" placeholder="पूछें या समस्या बताएं..." type="text"/>
+<div class="absolute right-4 flex items-center gap-3">
+<button class="text-slate-400 hover:text-white">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="text-slate-400 hover:text-white">
+<span class="material-symbols-outlined">image</span>
+</button>
+</div>
+</div>
+<!-- Send Button -->
+<button class="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-[0_0_20px_rgba(5,148,103,0.4)] transition-all hover:scale-105 active:scale-95 shrink-0">
+<span class="material-symbols-outlined text-2xl rotate-[-45deg] translate-x-0.5 -translate-y-0.5">send</span>
+</button>
+</div>
+<p class="text-center mt-4 text-[10px] text-slate-500 font-display tracking-widest uppercase opacity-60">JanSathi AI can make mistakes. Verify critical agricultural info.</p>
+</div>
+</body></html>
