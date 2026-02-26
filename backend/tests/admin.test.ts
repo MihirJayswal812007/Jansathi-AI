@@ -1,7 +1,7 @@
 // ===== JanSathi AI — Admin Route Integration Tests =====
 
 import { describe, it, expect, afterAll } from "vitest";
-import { request, createTestSession, createTestAdmin, createTestConversation } from "./helpers/setup";
+import { request, createTestSession, createTestAdmin, createTestConversation, createTestUser } from "./helpers/setup";
 import { cleanupTestData, disconnectDb } from "./helpers/db";
 
 afterAll(async () => {
@@ -183,5 +183,71 @@ describe("GET /api/admin/conversations/:id", () => {
             .set("Cookie", session.cookie);
 
         expect([400, 404, 500]).toContain(res.status);
+    });
+});
+
+describe("PATCH /api/admin/users/:id/role", () => {
+    it("should return 403 for non-admin user", async () => {
+        const { cookie } = await createTestSession();
+
+        const res = await request
+            .patch("/api/admin/users/some-id/role")
+            .set("Cookie", cookie)
+            .send({ role: "admin" });
+
+        expect(res.status).toBe(403);
+    });
+
+    it("should change user role", async () => {
+        const { session } = await createTestAdmin();
+        const targetUser = await createTestUser();
+
+        const res = await request
+            .patch(`/api/admin/users/${targetUser.id}/role`)
+            .set("Cookie", session.cookie)
+            .send({ role: "admin" });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.role).toBe("admin");
+    });
+
+    it("should block self-demotion", async () => {
+        const { session, user } = await createTestAdmin();
+
+        const res = await request
+            .patch(`/api/admin/users/${user.id}/role`)
+            .set("Cookie", session.cookie)
+            .send({ role: "user" });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe("INVALID_INPUT");
+    });
+});
+
+describe("PATCH /api/admin/users/:id/active", () => {
+    it("should return 403 for non-admin user", async () => {
+        const { cookie } = await createTestSession();
+
+        const res = await request
+            .patch("/api/admin/users/some-id/active")
+            .set("Cookie", cookie)
+            .send({ active: false });
+
+        expect(res.status).toBe(403);
+    });
+
+    it("should deactivate a user", async () => {
+        const { session } = await createTestAdmin();
+        const targetUser = await createTestUser();
+
+        const res = await request
+            .patch(`/api/admin/users/${targetUser.id}/active`)
+            .set("Cookie", session.cookie)
+            .send({ active: false });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.active).toBe(false);
     });
 });

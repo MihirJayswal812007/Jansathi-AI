@@ -4,6 +4,7 @@ import { adminRateLimiter } from "../middleware/rateLimiter";
 import { sendError } from "../middleware/errorHandler";
 import { getDashboardStats, getTrends } from "../services/analytics.service";
 import { searchConversations, getConversationHistory } from "../services/conversation";
+import { userService } from "../services/user.service";
 import prisma from "../models/prisma";
 import logger from "../utils/logger";
 
@@ -160,5 +161,65 @@ adminRouter.get("/conversations/:id", async (req: Request, res: Response) => {
             error: error instanceof Error ? error.message : String(error),
         });
         sendError(res, "DB_ERROR", "Failed to fetch conversation", requestId);
+    }
+});
+
+// PATCH /api/admin/users/:id/role — Change user role
+adminRouter.patch("/users/:id/role", async (req: Request, res: Response) => {
+    const requestId = logger.generateRequestId();
+
+    try {
+        const targetUserId = req.params.id as string;
+        const { role } = req.body;
+
+        if (!role || typeof role !== "string") {
+            return sendError(res, "INVALID_INPUT", "role is required", requestId);
+        }
+
+        const adminId = req.session?.userId;
+        if (!adminId) {
+            return sendError(res, "UNAUTHORIZED", "Admin user not linked", requestId);
+        }
+
+        const updated = await userService.adminUpdateRole(targetUserId, role, adminId);
+        res.json({ success: true, data: updated, requestId });
+    } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        logger.error("api.admin.users.role.error", { requestId, error: msg });
+
+        if (msg.includes("Cannot change your own") || msg.includes("Invalid role")) {
+            return sendError(res, "INVALID_INPUT", msg, requestId);
+        }
+        sendError(res, "DB_ERROR", "Failed to update role", requestId);
+    }
+});
+
+// PATCH /api/admin/users/:id/active — Activate or deactivate user
+adminRouter.patch("/users/:id/active", async (req: Request, res: Response) => {
+    const requestId = logger.generateRequestId();
+
+    try {
+        const targetUserId = req.params.id as string;
+        const { active } = req.body;
+
+        if (typeof active !== "boolean") {
+            return sendError(res, "INVALID_INPUT", "active must be a boolean", requestId);
+        }
+
+        const adminId = req.session?.userId;
+        if (!adminId) {
+            return sendError(res, "UNAUTHORIZED", "Admin user not linked", requestId);
+        }
+
+        const updated = await userService.adminSetActive(targetUserId, active, adminId);
+        res.json({ success: true, data: updated, requestId });
+    } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        logger.error("api.admin.users.active.error", { requestId, error: msg });
+
+        if (msg.includes("Cannot deactivate your own")) {
+            return sendError(res, "INVALID_INPUT", msg, requestId);
+        }
+        sendError(res, "DB_ERROR", "Failed to update user status", requestId);
     }
 });

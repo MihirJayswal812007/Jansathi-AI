@@ -49,12 +49,19 @@ export async function getSession(req: Request): Promise<SessionData | null> {
     // JOIN User.role to derive role dynamically (fixes audit F1: role drift)
     const session = await prisma.session.findUnique({
         where: { token },
-        include: { user: { select: { role: true } } },
+        include: { user: { select: { role: true, active: true } } },
     });
     if (!session) return null;
 
     if (session.expiresAt < new Date()) {
         await prisma.session.delete({ where: { id: session.id } }).catch(() => { });
+        return null;
+    }
+
+    // Reject deactivated users — destroy session and deny access
+    if (session.user && session.user.active === false) {
+        await prisma.session.delete({ where: { id: session.id } }).catch(() => { });
+        logger.warn("auth.deactivated_user.blocked", { userId: session.userId });
         return null;
     }
 

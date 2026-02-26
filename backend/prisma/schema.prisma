@@ -39,6 +39,7 @@ model User {
   email    String? @unique
   name     String?
   role     String  @default("user") // "user" | "admin"
+  active   Boolean @default(true)
   language String  @default("hi") // "hi" | "en"
 
   // Location

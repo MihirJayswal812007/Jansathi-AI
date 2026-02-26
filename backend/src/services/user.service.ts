@@ -230,6 +230,76 @@ class UserService {
             logger.warn("user.last_active.failed", { userId });
         }
     }
+    /**
+     * Admin: Change a user's role. Prevents self-demotion.
+     */
+    async adminUpdateRole(
+        targetUserId: string,
+        newRole: string,
+        adminId: string
+    ): Promise<{ id: string; role: string }> {
+        const VALID_ROLES = ["user", "admin"];
+        if (!VALID_ROLES.includes(newRole)) {
+            throw new Error(`Invalid role. Must be one of: ${VALID_ROLES.join(", ")}`);
+        }
+
+        if (targetUserId === adminId) {
+            throw new Error("Cannot change your own role");
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: targetUserId },
+            data: { role: newRole },
+            select: { id: true, role: true },
+        });
+
+        logger.info("admin.user.role_changed", {
+            targetUserId,
+            newRole,
+            adminId,
+        });
+
+        return updated;
+    }
+
+    /**
+     * Admin: Activate or deactivate a user account.
+     */
+    async adminSetActive(
+        targetUserId: string,
+        active: boolean,
+        adminId: string
+    ): Promise<{ id: string; active: boolean }> {
+        if (targetUserId === adminId) {
+            throw new Error("Cannot deactivate your own account");
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: targetUserId },
+            data: { active },
+            select: { id: true, active: true },
+        });
+
+        // If deactivating, also kill all their sessions
+        if (!active) {
+            const deleted = await prisma.session.deleteMany({
+                where: { userId: targetUserId },
+            });
+            logger.info("admin.user.sessions_revoked", {
+                targetUserId,
+                sessionsDeleted: deleted.count,
+                adminId,
+            });
+        }
+
+        logger.info("admin.user.active_changed", {
+            targetUserId,
+            active,
+            adminId,
+        });
+
+        return updated;
+    }
 }
 
 // ── Singleton ───────────────────────────────────────────────
