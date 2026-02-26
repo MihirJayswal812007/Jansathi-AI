@@ -14,22 +14,17 @@ import {
     RefreshCw,
     BarChart3,
     Globe,
+    TrendingUp,
+    TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
-
-// ── Types ────────────────────────────────────────────────────
-interface DashboardData {
-    totalUsers: number;
-    activeUsersToday: number;
-    totalConversations: number;
-    avgResponseTimeMs: number;
-    moduleUsage: Record<string, number>;
-    languageSplit: { hi: number; en: number };
-    topIntents: { intent: string; count: number }[];
-    dailyActiveUsers: { date: string; count: number }[];
-    satisfactionAvg: number;
-    resolvedRate: number;
-}
+import {
+    ensureAdminSession,
+    fetchDashboardStats,
+    fetchTrends,
+    type DashboardData,
+    type TrendData,
+} from "@/lib/apiClient";
 
 // ── Module config for display ────────────────────────────────
 const MODULE_DISPLAY: Record<
@@ -197,47 +192,62 @@ function DailyChart({
     );
 }
 
+// ── Trend Card Component ─────────────────────────────────────
+function TrendCard({
+    label,
+    value,
+    suffix,
+    isPositiveGood = true,
+    delay,
+}: {
+    label: string;
+    value: number;
+    suffix: string;
+    isPositiveGood?: boolean;
+    delay: number;
+}) {
+    const isPositive = value > 0;
+    const isGood = isPositiveGood ? isPositive : !isPositive;
+    const color = value === 0 ? "var(--text-muted)" : isGood ? "#10B981" : "#EF4444";
+    const Icon = isPositive ? TrendingUp : TrendingDown;
+
+    return (
+        <motion.div
+            className="p-3 rounded-xl text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay }}
+            style={{
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-primary)",
+            }}
+        >
+            <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+                {label}
+            </p>
+            <div className="flex items-center justify-center gap-1">
+                {value !== 0 && <Icon size={14} style={{ color }} />}
+                <span className="text-lg font-bold" style={{ color }}>
+                    {value > 0 ? "+" : ""}
+                    {value}
+                    {suffix}
+                </span>
+            </div>
+        </motion.div>
+    );
+}
+
 // ── Main Dashboard Page ──────────────────────────────────────
 export default function DashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
+    const [trends, setTrends] = useState<TrendData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-    const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || "";
-
-    const ensureAdminSession = async (): Promise<boolean> => {
-        try {
-            // Step 1: Create or retrieve session
-            await fetch(`${API_BASE}/api/auth/session`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({}),
-            });
-
-            // Step 2: Promote to admin using secret
-            if (ADMIN_SECRET) {
-                const promoRes = await fetch(`${API_BASE}/api/auth/session`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ adminSecret: ADMIN_SECRET }),
-                });
-                const promoData = await promoRes.json();
-                return promoData.promoted === true || promoData.session?.role === "admin";
-            }
-            return false;
-        } catch {
-            return false;
-        }
-    };
-
-    const fetchData = async () => {
+    const loadData = async () => {
         setLoading(true);
         setError(null);
         try {
-            // Ensure we have an admin session before fetching
             const isAdmin = await ensureAdminSession();
             if (!isAdmin) {
                 setError("Admin authentication failed. Check NEXT_PUBLIC_ADMIN_SECRET.");
@@ -245,13 +255,13 @@ export default function DashboardPage() {
                 return;
             }
 
-            const res = await fetch(`${API_BASE}/api/dashboard`, { credentials: "include" });
-            const json = await res.json();
-            if (json.success && json.data) {
-                setData(json.data);
-            } else {
-                setError(json.error?.message || "Failed to load dashboard data");
-            }
+            const [statsData, trendsData] = await Promise.all([
+                fetchDashboardStats(),
+                fetchTrends(7).catch(() => null), // Trends are optional — don't block dashboard
+            ]);
+
+            setData(statsData);
+            setTrends(trendsData);
         } catch (err) {
             console.error("Failed to fetch dashboard:", err);
             setError("Network error — is the backend running?");
@@ -261,7 +271,8 @@ export default function DashboardPage() {
     };
 
     useEffect(() => {
-        fetchData();
+        loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const moduleEntries = data
@@ -304,7 +315,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 <button
-                    onClick={fetchData}
+                    onClick={loadData}
                     disabled={loading}
                     className="p-2 rounded-lg"
                     style={{ background: "var(--bg-surface)" }}
@@ -365,6 +376,36 @@ export default function DashboardPage() {
                             delay={0.25}
                         />
                     </div>
+
+                    {/* Trend Deltas */}
+                    {trends && (
+                        <div className="grid grid-cols-4 gap-2">
+                            <TrendCard
+                                label="Users"
+                                value={trends.deltas.activeUsers}
+                                suffix="%"
+                                delay={0.28}
+                            />
+                            <TrendCard
+                                label="Chats"
+                                value={trends.deltas.conversations}
+                                suffix="%"
+                                delay={0.3}
+                            />
+                            <TrendCard
+                                label="Rating"
+                                value={trends.deltas.satisfaction}
+                                suffix=""
+                                delay={0.32}
+                            />
+                            <TrendCard
+                                label="Resolved"
+                                value={trends.deltas.resolvedRate}
+                                suffix="pp"
+                                delay={0.34}
+                            />
+                        </div>
+                    )}
 
                     {/* Module Usage */}
                     <motion.div
@@ -532,7 +573,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center justify-center h-64 gap-4">
                     <p style={{ color: "var(--text-muted)" }}>{error || "Failed to load data"}</p>
                     <button
-                        onClick={fetchData}
+                        onClick={loadData}
                         className="px-4 py-2 rounded-lg text-sm font-medium"
                         style={{ background: "#3B82F6", color: "white" }}
                     >
