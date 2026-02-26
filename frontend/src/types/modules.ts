@@ -30,18 +30,6 @@ export interface QuickAction {
     query: string;
 }
 
-export interface UserProfile {
-    id: string;
-    name: string;
-    phone: string;
-    location: {
-        state: string;
-        district: string;
-        village: string;
-    };
-    preferredLanguage: Language;
-    occupation: string;
-}
 
 export interface ChatMessage {
     id: string;
@@ -49,6 +37,7 @@ export interface ChatMessage {
     content: string;
     timestamp: Date;
     mode: ModeName | null;
+    conversationId?: string;
     metadata?: {
         confidence?: number;
         language?: Language;

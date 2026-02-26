@@ -14,6 +14,7 @@ interface ChatAPIRequest {
     mode: ModeName | null;
     conversationHistory: { role: "user" | "assistant"; content: string }[];
     language: "hi" | "en";
+    conversationId?: string;
 }
 
 interface ChatAPIResponse {
@@ -21,6 +22,7 @@ interface ChatAPIResponse {
     mode: ModeName;
     confidence: number;
     intent?: string;
+    conversationId?: string;
     error?: string;
 }
 
@@ -28,7 +30,8 @@ export async function sendChatMessage(
     message: string,
     mode: ModeName | null,
     history: ChatMessage[],
-    language: "hi" | "en"
+    language: "hi" | "en",
+    conversationId?: string
 ): Promise<ChatAPIResponse> {
     const conversationHistory = history.slice(-6).map((msg) => ({
         role: msg.role as "user" | "assistant",
@@ -44,6 +47,7 @@ export async function sendChatMessage(
             mode,
             conversationHistory,
             language,
+            ...(conversationId ? { conversationId } : {}),
         } as ChatAPIRequest),
     });
 

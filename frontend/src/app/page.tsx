@@ -29,7 +29,7 @@ import { ChatMessage } from "@/types/modules";
 export default function HomePage() {
   const { activeMode, language, isProcessing, setActiveMode, setIsProcessing } =
     useModeStore();
-  const { messages, addMessage, clearMessages } = useChatStore();
+  const { messages, addMessage, clearMessages, conversationId, setConversationId } = useChatStore();
   const { isAuthenticated, handleLogout } = useAuth();
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -130,7 +130,12 @@ export default function HomePage() {
     playSound("messageSent");
 
     try {
-      const response = await sendChatMessage(text, activeMode, messages, language);
+      const response = await sendChatMessage(text, activeMode, messages, language, conversationId ?? undefined);
+
+      // Track conversation thread
+      if (response.conversationId) {
+        setConversationId(response.conversationId);
+      }
 
       if (response.mode !== activeMode) {
         setActiveMode(response.mode);
@@ -143,6 +148,7 @@ export default function HomePage() {
         content: response.content,
         timestamp: new Date(),
         mode: response.mode,
+        conversationId: response.conversationId,
       };
 
       addMessage(assistantMessage);
