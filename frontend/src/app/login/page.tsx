@@ -16,7 +16,7 @@ export default function LoginPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectTo = searchParams.get("redirect") || "/";
-    const { setSession } = useUserStore();
+    const { setAuth } = useUserStore();
 
     const [step, setStep] = useState<Step>("identifier");
     const [identifier, setIdentifier] = useState("");
@@ -89,7 +89,7 @@ export default function LoginPage() {
         try {
             const result = await verifyOTP(identifier.trim(), code);
             if (result.success && result.session) {
-                setSession(result.session.id, result.session.role === "admin");
+                setAuth(result.session); // update global auth state → sidebar reacts
                 router.push(redirectTo);
             } else {
                 setError(result.message || "Invalid OTP");
