@@ -1,11 +1,11 @@
 // ===== JanSathi AI — App Shell with Sidebar =====
-// Desktop: fixed left sidebar (240px). Tablet: collapsed (64px icons). 
-// Mobile: hidden (navigation via MobileMenu hamburger).
+// Desktop: fixed left sidebar (240px, collapsible). Tablet: 64px icons. Mobile: hidden.
 
 "use client";
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useModeStore } from "@/store/modeStore";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -30,6 +30,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { isAuthenticated, isAdmin, handleLogout } = useAuth();
     const { language } = useModeStore();
+    const [collapsed, setCollapsed] = useState(false);
+
+    // Persist sidebar state across page loads
+    useEffect(() => {
+        const saved = localStorage.getItem("sidebar-collapsed");
+        if (saved === "true") setCollapsed(true);
+    }, []);
+
+    const toggleCollapsed = () => {
+        setCollapsed((prev) => {
+            const next = !prev;
+            localStorage.setItem("sidebar-collapsed", String(next));
+            return next;
+        });
+    };
 
     // Filter nav items based on auth state
     const visibleItems = NAV_ITEMS.filter((item) => {
@@ -46,9 +61,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="app-shell">
-            {/* Sidebar — hidden on mobile via CSS */}
-            <aside className="sidebar" aria-label="Main navigation">
-                {/* Logo area */}
+            {/* Sidebar */}
+            <aside
+                className={`sidebar${collapsed ? " sidebar--collapsed" : ""}`}
+                aria-label="Main navigation"
+            >
+                {/* Logo + collapse toggle */}
                 <div className="sidebar-header">
                     <div className="sidebar-logo">
                         <span
@@ -58,7 +76,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             auto_awesome
                         </span>
                     </div>
-                    <span className="sidebar-brand font-display">{APP_NAME}</span>
+                    {!collapsed && (
+                        <span className="sidebar-brand font-display">{APP_NAME}</span>
+                    )}
+                    <button
+                        className="sidebar-collapse-btn"
+                        onClick={toggleCollapsed}
+                        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    >
+                        <span className="material-symbols-outlined">
+                            {collapsed ? "chevron_right" : "chevron_left"}
+                        </span>
+                    </button>
                 </div>
 
                 {/* Nav items */}
@@ -73,10 +103,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             <span className="material-symbols-outlined sidebar-icon">
                                 {item.icon}
                             </span>
-                            <span className="sidebar-label">
-                                {language === "hi" ? item.labelHi : item.label}
-                            </span>
-                            {item.auth === "admin" && (
+                            {!collapsed && (
+                                <span className="sidebar-label">
+                                    {language === "hi" ? item.labelHi : item.label}
+                                </span>
+                            )}
+                            {item.auth === "admin" && !collapsed && (
                                 <span className="sidebar-admin-badge">Admin</span>
                             )}
                         </Link>
@@ -85,9 +117,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
                 {/* Bottom section */}
                 <div className="sidebar-footer">
-                    <div className="sidebar-lang">
-                        <LanguageSwitcher />
-                    </div>
+                    {!collapsed && (
+                        <div className="sidebar-lang">
+                            <LanguageSwitcher />
+                        </div>
+                    )}
 
                     {isAuthenticated ? (
                         <button
@@ -98,9 +132,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             <span className="material-symbols-outlined sidebar-icon">
                                 logout
                             </span>
-                            <span className="sidebar-label">
-                                {language === "hi" ? "लॉग आउट" : "Logout"}
-                            </span>
+                            {!collapsed && (
+                                <span className="sidebar-label">
+                                    {language === "hi" ? "लॉग आउट" : "Logout"}
+                                </span>
+                            )}
                         </button>
                     ) : (
                         <Link
@@ -111,16 +147,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             <span className="material-symbols-outlined sidebar-icon">
                                 login
                             </span>
-                            <span className="sidebar-label">
-                                {language === "hi" ? "लॉग इन" : "Login"}
-                            </span>
+                            {!collapsed && (
+                                <span className="sidebar-label">
+                                    {language === "hi" ? "लॉग इन" : "Login"}
+                                </span>
+                            )}
                         </Link>
                     )}
                 </div>
             </aside>
 
-            {/* Main content area */}
-            <div className="app-main">
+            {/* Main content area — shifts with sidebar */}
+            <div className={`app-main${collapsed ? " app-main--sidebar-collapsed" : ""}`}>
                 {children}
             </div>
         </div>
