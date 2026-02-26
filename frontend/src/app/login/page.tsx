@@ -76,10 +76,10 @@ export default function LoginPage() {
     };
 
     // ── Step 2: Verify OTP ──────────────────────────────────
-    const handleVerifyOTP = async () => {
-        const code = otp.join("");
-        if (code.length < 4) {
-            setError("Enter the complete OTP");
+    const handleVerifyOTP = async (codeOverride?: string) => {
+        const code = codeOverride ?? otp.join("");
+        if (code.length < 6) {
+            setError("Enter the complete 6-digit OTP");
             return;
         }
 
@@ -116,11 +116,11 @@ export default function LoginPage() {
             otpRefs.current[index + 1]?.focus();
         }
 
-        // Auto-submit on last digit
+        // Auto-submit on last digit — pass code directly to avoid stale closure
         if (value && index === 5) {
             const code = newOtp.join("");
             if (code.length === 6) {
-                setTimeout(() => handleVerifyOTP(), 100);
+                setTimeout(() => handleVerifyOTP(code), 100);
             }
         }
     };
@@ -322,8 +322,8 @@ export default function LoginPage() {
                                 )}
 
                                 <button
-                                    onClick={handleVerifyOTP}
-                                    disabled={loading || otp.join("").length < 4}
+                                    onClick={() => handleVerifyOTP()}
+                                    disabled={loading || otp.join("").length < 6}
                                     className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-opacity"
                                     style={{
                                         background: "linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)",
