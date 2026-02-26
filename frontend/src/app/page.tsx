@@ -20,6 +20,7 @@ import { useChatStore } from "@/store/chatStore";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { useAuth } from "@/hooks/useAuth";
 import { sendChatMessage } from "@/lib/apiClient";
 import { MODE_CONFIGS, APP_NAME, APP_TAGLINE, APP_TAGLINE_HI } from "@/lib/constants";
 import { ChatMessage } from "@/types/modules";
@@ -29,6 +30,7 @@ export default function HomePage() {
   const { activeMode, language, isProcessing, setActiveMode, setIsProcessing } =
     useModeStore();
   const { messages, addMessage, clearMessages } = useChatStore();
+  const { isAuthenticated, handleLogout } = useAuth();
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [textInput, setTextInput] = useState("");
@@ -255,6 +257,31 @@ export default function HomePage() {
                 dashboard
               </span>
             </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="glass-card"
+                style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "none" }}
+                title={language === "hi" ? "लॉग आउट" : "Logout"}
+                aria-label="Logout"
+              >
+                <span className="material-symbols-outlined" style={{ color: "#10B981", fontSize: "20px" }}>
+                  person
+                </span>
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="glass-card"
+                style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                title={language === "hi" ? "लॉग इन" : "Login"}
+                aria-label="Login"
+              >
+                <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
+                  login
+                </span>
+              </Link>
+            )}
             <LanguageSwitcher />
           </div>
         </div>
