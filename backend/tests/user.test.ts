@@ -1,7 +1,7 @@
 // ===== JanSathi AI — User Profile Integration Tests =====
 
 import { describe, it, expect, afterAll } from "vitest";
-import { request, createAuthenticatedUser, createTestSession } from "./helpers/setup";
+import { request, createAuthenticatedUser, createTestSession, createTestConversation } from "./helpers/setup";
 import { cleanupTestData, disconnectDb } from "./helpers/db";
 
 afterAll(async () => {
@@ -102,5 +102,67 @@ describe("GET /api/user/preferences", () => {
         expect(res.body.success).toBe(true);
         expect(res.body.data).toHaveProperty("voiceEnabled");
         expect(res.body.data).toHaveProperty("fontSize");
+    });
+});
+
+describe("GET /api/user/conversations", () => {
+    it("should return 401 without session", async () => {
+        const res = await request.get("/api/user/conversations");
+        expect(res.status).toBe(401);
+    });
+
+    it("should return paginated conversations for authenticated user", async () => {
+        const { user, session } = await createAuthenticatedUser();
+        await createTestConversation(user.id, "janseva");
+        await createTestConversation(user.id, "jankrishi");
+
+        const res = await request
+            .get("/api/user/conversations?page=1&limit=10")
+            .set("Cookie", session.cookie);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data).toBeInstanceOf(Array);
+        expect(res.body.data.length).toBeGreaterThanOrEqual(2);
+        expect(res.body.pagination).toHaveProperty("page", 1);
+        expect(res.body.pagination).toHaveProperty("totalPages");
+    });
+
+    it("should return empty list for fresh user", async () => {
+        const { session } = await createAuthenticatedUser();
+
+        const res = await request
+            .get("/api/user/conversations")
+            .set("Cookie", session.cookie);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data).toEqual([]);
+    });
+});
+
+describe("GET /api/user/conversations/:id", () => {
+    it("should return conversation detail with messages", async () => {
+        const { user, session } = await createAuthenticatedUser();
+        const convId = await createTestConversation(user.id);
+
+        const res = await request
+            .get(`/api/user/conversations/${convId}`)
+            .set("Cookie", session.cookie);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.id).toBe(convId);
+        expect(res.body.data.messages).toBeInstanceOf(Array);
+        expect(res.body.data.messages.length).toBe(2);
+    });
+
+    it("should return error for non-existent conversation", async () => {
+        const { session } = await createAuthenticatedUser();
+
+        const res = await request
+            .get("/api/user/conversations/non-existent-id")
+            .set("Cookie", session.cookie);
+
+        expect([400, 404, 500]).toContain(res.status);
     });
 });

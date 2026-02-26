@@ -1,7 +1,7 @@
 // ===== JanSathi AI — Admin Route Integration Tests =====
 
 import { describe, it, expect, afterAll } from "vitest";
-import { request, createTestSession, createTestAdmin } from "./helpers/setup";
+import { request, createTestSession, createTestAdmin, createTestConversation } from "./helpers/setup";
 import { cleanupTestData, disconnectDb } from "./helpers/db";
 
 afterAll(async () => {
@@ -116,5 +116,72 @@ describe("GET /api/admin/trends", () => {
 
         expect(res.status).toBe(200);
         expect(res.body.data.snapshots.length).toBeLessThanOrEqual(3);
+    });
+});
+
+describe("GET /api/admin/conversations", () => {
+    it("should return 403 for non-admin user", async () => {
+        const { cookie } = await createTestSession();
+
+        const res = await request
+            .get("/api/admin/conversations")
+            .set("Cookie", cookie);
+
+        expect(res.status).toBe(403);
+    });
+
+    it("should return paginated conversations for admin", async () => {
+        const { session, user } = await createTestAdmin();
+        await createTestConversation(user.id, "janseva");
+
+        const res = await request
+            .get("/api/admin/conversations?page=1&limit=10")
+            .set("Cookie", session.cookie);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data).toBeInstanceOf(Array);
+        expect(res.body.pagination).toBeDefined();
+        expect(res.body.pagination).toHaveProperty("page", 1);
+        expect(res.body.pagination).toHaveProperty("totalPages");
+    });
+
+    it("should filter by mode", async () => {
+        const { session, user } = await createTestAdmin();
+        await createTestConversation(user.id, "jankrishi");
+
+        const res = await request
+            .get("/api/admin/conversations?mode=jankrishi")
+            .set("Cookie", session.cookie);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.every((c: { mode: string }) => c.mode === "jankrishi")).toBe(true);
+    });
+});
+
+describe("GET /api/admin/conversations/:id", () => {
+    it("should return conversation detail for admin", async () => {
+        const { session, user } = await createTestAdmin();
+        const convId = await createTestConversation(user.id);
+
+        const res = await request
+            .get(`/api/admin/conversations/${convId}`)
+            .set("Cookie", session.cookie);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.id).toBe(convId);
+        expect(res.body.data.messages).toBeInstanceOf(Array);
+        expect(res.body.data.messages.length).toBe(2);
+    });
+
+    it("should return error for non-existent conversation", async () => {
+        const { session } = await createTestAdmin();
+
+        const res = await request
+            .get("/api/admin/conversations/non-existent-id")
+            .set("Cookie", session.cookie);
+
+        expect([400, 404, 500]).toContain(res.status);
     });
 });

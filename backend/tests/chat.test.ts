@@ -1,7 +1,7 @@
 // ===== JanSathi AI — Chat Route Integration Tests =====
 
 import { describe, it, expect, afterAll } from "vitest";
-import { request, createTestSession, SESSION_COOKIE } from "./helpers/setup";
+import { request, createTestSession, createAuthenticatedUser, createTestConversation, SESSION_COOKIE } from "./helpers/setup";
 import { cleanupTestData, disconnectDb } from "./helpers/db";
 
 afterAll(async () => {
@@ -77,5 +77,39 @@ describe("POST /api/chat", () => {
 
         // Should not set a new session cookie (reusing existing)
         expect([200, 500]).toContain(res.status);
+    });
+});
+
+describe("PATCH /api/chat/:id/feedback", () => {
+    it("should return 400 for missing satisfaction", async () => {
+        const res = await request
+            .patch("/api/chat/some-id/feedback")
+            .send({});
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe("INVALID_INPUT");
+    });
+
+    it("should return 400 for out-of-range satisfaction", async () => {
+        const res = await request
+            .patch("/api/chat/some-id/feedback")
+            .send({ satisfaction: 10 });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe("INVALID_INPUT");
+    });
+
+    it("should accept valid feedback for existing conversation", async () => {
+        // Create a user + conversation to submit feedback for
+        const { user } = await createAuthenticatedUser();
+        const convId = await createTestConversation(user.id);
+
+        const res = await request
+            .patch(`/api/chat/${convId}/feedback`)
+            .send({ satisfaction: 5 });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.message).toBe("Feedback recorded");
     });
 });

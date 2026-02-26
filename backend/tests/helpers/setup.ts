@@ -78,3 +78,36 @@ export async function createAuthenticatedUser(overrides?: {
 export async function createTestAdmin() {
     return createAuthenticatedUser({ role: "admin", name: "TestAdmin" });
 }
+
+/**
+ * Create a test conversation with 2 messages (user + assistant).
+ * Returns the conversation ID.
+ */
+export async function createTestConversation(
+    userId: string,
+    mode = "janseva"
+) {
+    const conversation = await prisma.conversation.create({
+        data: {
+            userId,
+            mode,
+        },
+    });
+
+    await prisma.message.createMany({
+        data: [
+            {
+                conversationId: conversation.id,
+                role: "user",
+                content: "Test user message",
+            },
+            {
+                conversationId: conversation.id,
+                role: "assistant",
+                content: "Test assistant response",
+            },
+        ],
+    });
+
+    return conversation.id;
+}
