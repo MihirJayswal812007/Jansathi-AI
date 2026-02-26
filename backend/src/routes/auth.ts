@@ -16,7 +16,8 @@ import logger from "../utils/logger";
 
 export const authRouter = Router();
 
-authRouter.use(authRateLimiter);
+// Rate limiters applied per-route (not globally) so session checks
+// don't consume the strict OTP budget.
 
 // POST /api/auth/session — Create or refresh session
 authRouter.post("/session", async (req: Request, res: Response) => {
@@ -55,8 +56,7 @@ authRouter.post("/session", async (req: Request, res: Response) => {
     }
 });
 
-// GET /api/auth/session — Check current session
-// Uses a relaxed rate limiter (60/min) — called on every page load
+// GET /api/auth/session — Check current session (60 req/min — called on every page load)
 authRouter.get("/session", sessionCheckRateLimiter, async (req: Request, res: Response) => {
     const requestId = logger.generateRequestId();
     const session = await getSession(req);
@@ -68,8 +68,8 @@ authRouter.get("/session", sessionCheckRateLimiter, async (req: Request, res: Re
     res.json({ success: true, authenticated: true, session, requestId });
 });
 
-// POST /api/auth/request-otp — Request OTP for phone or email
-authRouter.post("/request-otp", async (req: Request, res: Response) => {
+// POST /api/auth/request-otp — Request OTP (5 req/min strict)
+authRouter.post("/request-otp", authRateLimiter, async (req: Request, res: Response) => {
     const requestId = logger.generateRequestId();
 
     try {
@@ -106,8 +106,8 @@ authRouter.post("/request-otp", async (req: Request, res: Response) => {
     }
 });
 
-// POST /api/auth/verify-otp — Verify OTP and authenticate
-authRouter.post("/verify-otp", async (req: Request, res: Response) => {
+// POST /api/auth/verify-otp — Verify OTP and authenticate (5 req/min strict)
+authRouter.post("/verify-otp", authRateLimiter, async (req: Request, res: Response) => {
     const requestId = logger.generateRequestId();
 
     try {
