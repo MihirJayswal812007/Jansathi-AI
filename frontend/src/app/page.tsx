@@ -14,6 +14,7 @@ import QuickActions from "@/components/common/QuickActions";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import LoadingDots from "@/components/common/LoadingDots";
 import ModulePanel from "@/components/common/ModulePanel";
+import FeedbackBar from "@/components/chat/FeedbackBar";
 
 import { useModeStore } from "@/store/modeStore";
 import { useChatStore } from "@/store/chatStore";
@@ -437,15 +438,21 @@ export default function HomePage() {
               role="log"
               aria-live="polite"
               aria-label={language === "hi" ? "चैट संदेश" : "Chat messages"}>
-              {messages.map((msg) => (
-                <ChatBubble
-                  key={msg.id}
-                  message={msg}
-                  onSpeak={msg.role === "assistant" ? speak : undefined}
-                  isSpeaking={isSpeaking}
-                  onStopSpeaking={stopSpeaking}
-                  language={language}
-                />
+              {messages.map((msg, i) => (
+                <div key={msg.id}>
+                  <ChatBubble
+                    message={msg}
+                    onSpeak={msg.role === "assistant" ? speak : undefined}
+                    isSpeaking={isSpeaking}
+                    onStopSpeaking={stopSpeaking}
+                    language={language}
+                  />
+                  {msg.role === "assistant" && msg.conversationId && i === messages.length - 1 && (
+                    <div style={{ paddingLeft: "12px", marginBottom: "4px" }}>
+                      <FeedbackBar conversationId={msg.conversationId} />
+                    </div>
+                  )}
+                </div>
               ))}
 
               {isProcessing && <LoadingDots />}

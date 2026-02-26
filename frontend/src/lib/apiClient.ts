@@ -58,6 +58,21 @@ export async function sendChatMessage(
     return response.json();
 }
 
+/** Submit satisfaction rating for a conversation. */
+export async function submitFeedback(
+    conversationId: string,
+    satisfaction: number
+): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_BASE}/api/chat/${conversationId}/feedback`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ satisfaction }),
+    });
+    if (!res.ok) throw new Error(`Feedback error: ${res.status}`);
+    return res.json();
+}
+
 // ── Auth API ────────────────────────────────────────────────
 
 export interface SessionInfo {
