@@ -17,6 +17,10 @@ export interface AIRequest {
     channel?: "web" | "whatsapp" | "api";
     /** Optional: request ID for tracing */
     requestId?: string;
+    /** Optional: authenticated user ID (for conversation memory) */
+    userId?: string;
+    /** Optional: current conversation ID (to exclude from memory search) */
+    conversationId?: string;
 }
 
 export interface AIResponse {

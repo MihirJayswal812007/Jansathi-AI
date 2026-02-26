@@ -65,9 +65,10 @@ model User {
   lastActiveAt DateTime @default(now())
 
   // Relations
-  sessions      Session[]
-  conversations Conversation[]
-  analytics     AnalyticsEvent[]
+  sessions           Session[]
+  conversations      Conversation[]
+  analytics          AnalyticsEvent[]
+  conversationMemory ConversationMemory[]
 
   @@map("users")
 }
@@ -183,4 +184,24 @@ model Document {
 
   @@index([module])
   @@map("documents")
+}
+
+// ── Conversation Memory Model (per-user semantic memory) ────
+model ConversationMemory {
+  id             String   @id
+  userId         String   @map("user_id")
+  conversationId String?  @map("conversation_id")
+  role           String   // "user" | "assistant"
+  content        String
+  // embedding vector(1536) — managed via raw SQL migration
+  module         String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("conversation_memory")
 }

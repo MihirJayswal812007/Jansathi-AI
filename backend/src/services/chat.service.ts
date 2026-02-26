@@ -9,6 +9,7 @@ import logger from "../utils/logger";
 import { detectIntent } from "./intent.service";
 import { aiService } from "../orchestration/AIService";
 import { userService } from "./user.service";
+import { conversationMemoryService } from "../retrieval";
 import {
     createConversation,
     addMessage,
@@ -76,6 +77,8 @@ export async function handleChat(
         })),
         channel: "web",
         requestId: conversationId,
+        userId: session.userId ?? undefined,
+        conversationId: conversationId ?? undefined,
     });
 
     // 5. Persist AI response
@@ -89,6 +92,22 @@ export async function handleChat(
     // 6. Update lastActiveAt (fire-and-forget — never blocks response)
     if (session.userId) {
         userService.updateLastActive(session.userId);
+
+        // 6.5 Store conversation turns in semantic memory (fire-and-forget)
+        conversationMemoryService.store({
+            userId: session.userId,
+            conversationId: conversationId ?? undefined,
+            role: "user",
+            content: message,
+            module: activeMode,
+        });
+        conversationMemoryService.store({
+            userId: session.userId,
+            conversationId: conversationId ?? undefined,
+            role: "assistant",
+            content: aiResult.content,
+            module: activeMode,
+        });
     }
 
     // 7. Track analytics (fire-and-forget)

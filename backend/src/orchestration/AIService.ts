@@ -8,7 +8,7 @@ import { INTENT_ROUTER_PROMPT } from "../config/prompts";
 import { llmProvider } from "../providers/llm";
 import type { LLMOutput } from "../providers/types";
 import { buildContext } from "../modules";
-import { retrievalService } from "../retrieval";
+import { retrievalService, conversationMemoryService } from "../retrieval";
 import { promptBuilder } from "./PromptBuilder";
 import { outputValidator } from "./OutputValidator";
 import { retryPolicy } from "./RetryPolicy";
@@ -68,6 +68,18 @@ class AIServiceImpl {
                 ? `${moduleContext}\n\nRelevant Knowledge Base:\n${ragContext}`
                 : moduleContext;
 
+            // 1.7. Retrieve conversation memory (if enabled + user authenticated)
+            const memoryContext = request.userId
+                ? await conversationMemoryService.retrieve(
+                    request.message,
+                    request.userId,
+                    request.conversationId
+                )
+                : "";
+            const enrichedContext = memoryContext
+                ? `${fullContext}\n\nRelevant Past Conversations:\n${memoryContext}`
+                : fullContext;
+
             // 2. Sanitize user input
             const sanitizedMessage = outputValidator.sanitizeInput(request.message);
 
@@ -75,7 +87,7 @@ class AIServiceImpl {
             const { systemPrompt, messages } = promptBuilder.buildMessages(
                 {
                     mode: request.mode,
-                    moduleContext: fullContext,
+                    moduleContext: enrichedContext,
                     language: request.language,
                     message: sanitizedMessage,
                 },
@@ -180,6 +192,9 @@ class AIServiceImpl {
                 toolsUsed,
                 requestId,
             };
+
+            // Note: memory storage happens in chat.service.ts after message persistence
+            // to avoid storing messages that fail to persist.
         } catch (error) {
             const durationMs = Date.now() - startTime;
 
