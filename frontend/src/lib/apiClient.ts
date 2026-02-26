@@ -149,6 +149,7 @@ export async function requestOTP(identifier: string): Promise<{
     success: boolean;
     message: string;
     expiresInSeconds?: number;
+    devOtp?: string;
 }> {
     const res = await fetch(`${API_BASE}/api/auth/request-otp`, {
         method: "POST",

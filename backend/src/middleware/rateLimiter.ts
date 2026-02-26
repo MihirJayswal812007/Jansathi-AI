@@ -12,7 +12,8 @@ import logger from "../utils/logger";
 const CONFIGS: Record<string, { max: number; windowMs: number }> = {
     "/api/chat": { max: 10, windowMs: 60_000 },
     "/api/analytics": { max: 50, windowMs: 60_000 },
-    "/api/auth": { max: 5, windowMs: 60_000 },
+    "/api/auth": { max: 5, windowMs: 60_000 },       // OTP endpoints — strict
+    "/api/auth/session": { max: 60, windowMs: 60_000 }, // Session check — relaxed (hit every page load)
     "/api/admin": { max: 20, windowMs: 60_000 },
     default: { max: 30, windowMs: 60_000 },
 };
@@ -84,5 +85,8 @@ export const analyticsRateLimiter = createRateLimiter(CONFIGS["/api/analytics"])
 /** Strict rate limiter for auth OTP endpoints — 5 req/min */
 export const authRateLimiter = createRateLimiter(CONFIGS["/api/auth"]);
 
-/** Strict rate limiter for admin — 5 req/min */
+/** Relaxed rate limiter for session check — 60 req/min (called on every page load) */
+export const sessionCheckRateLimiter = createRateLimiter(CONFIGS["/api/auth/session"]);
+
+/** Strict rate limiter for admin — 20 req/min */
 export const adminRateLimiter = createRateLimiter(CONFIGS["/api/admin"]);

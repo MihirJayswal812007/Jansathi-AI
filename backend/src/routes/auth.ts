@@ -2,7 +2,7 @@
 // Session management + OTP authentication endpoints.
 
 import { Router, Request, Response } from "express";
-import { authRateLimiter } from "../middleware/rateLimiter";
+import { authRateLimiter, sessionCheckRateLimiter } from "../middleware/rateLimiter";
 import { sendError } from "../middleware/errorHandler";
 import {
     createSession,
@@ -56,7 +56,8 @@ authRouter.post("/session", async (req: Request, res: Response) => {
 });
 
 // GET /api/auth/session — Check current session
-authRouter.get("/session", async (req: Request, res: Response) => {
+// Uses a relaxed rate limiter (60/min) — called on every page load
+authRouter.get("/session", sessionCheckRateLimiter, async (req: Request, res: Response) => {
     const requestId = logger.generateRequestId();
     const session = await getSession(req);
 

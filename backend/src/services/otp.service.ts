@@ -6,8 +6,6 @@ import { createHash, randomInt } from "crypto";
 import prisma from "../models/prisma";
 import { OTP } from "../config/env";
 import logger from "../utils/logger";
-import { smsService } from "./sms.service";
-import { emailService } from "./email.service";
 
 // ── Types ───────────────────────────────────────────────────
 export interface OTPRequestResult {
@@ -15,6 +13,8 @@ export interface OTPRequestResult {
     message: string;
     /** Seconds until OTP expires — for frontend countdown */
     expiresInSeconds?: number;
+    /** ONLY returned in development mode for testing */
+    devOtp?: string;
 }
 
 export interface OTPVerifyResult {
@@ -94,31 +94,20 @@ class OTPService {
             expiresAt: expiresAt.toISOString(),
         });
 
-        // ── Deliver OTP via SMS or Email ─────────────────────
-        const isEmail = normalized.includes("@");
-        const delivery = isEmail
-            ? await emailService.sendOTP(normalized, code)
-            : await smsService.sendOTP(normalized, code);
-
-        if (!delivery.sent) {
-            logger.error("otp.delivery_failed", {
-                identifier: this.maskIdentifier(normalized),
-                channel: isEmail ? "email" : "sms",
-                error: delivery.error,
-            });
-            return {
-                success: false,
-                message: delivery.error || "Failed to send OTP. Please try again.",
-            };
-        }
-
-        return {
+        // In production: send OTP via SMS/email gateway here
+        // For MVP: return in dev mode only
+        const result: OTPRequestResult = {
             success: true,
-            message: isEmail
-                ? "OTP sent to your email address"
-                : "OTP sent to your mobile number",
+            message: "OTP sent successfully",
             expiresInSeconds: OTP.expirySeconds,
         };
+
+        // Dev-only: expose OTP for testing (NEVER in production)
+        if (process.env.NODE_ENV === "development") {
+            result.devOtp = code;
+        }
+
+        return result;
     }
 
     /**

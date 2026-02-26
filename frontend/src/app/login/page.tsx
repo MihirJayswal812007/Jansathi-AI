@@ -23,6 +23,7 @@ export default function LoginPage() {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [devOtp, setDevOtp] = useState<string | null>(null);
     const [expiresIn, setExpiresIn] = useState(0);
 
     const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -62,6 +63,7 @@ export default function LoginPage() {
             if (result.success) {
                 setStep("otp");
                 setExpiresIn(result.expiresInSeconds || 300);
+                if (result.devOtp) setDevOtp(result.devOtp);
                 setTimeout(() => otpRefs.current[0]?.focus(), 100);
             } else {
                 setError(result.message || "Failed to send OTP");
@@ -252,6 +254,7 @@ export default function LoginPage() {
                                         setStep("identifier");
                                         setOtp(["", "", "", "", "", ""]);
                                         setError(null);
+                                        setDevOtp(null);
                                     }}
                                     className="flex items-center gap-1 text-xs mb-3"
                                     style={{ color: "var(--text-muted)" }}
@@ -273,6 +276,20 @@ export default function LoginPage() {
                                         </span>
                                     )}
                                 </p>
+
+                                {/* Dev OTP hint */}
+                                {devOtp && (
+                                    <div
+                                        className="text-xs p-2 rounded-lg mb-3"
+                                        style={{
+                                            background: "#F59E0B20",
+                                            color: "#F59E0B",
+                                            border: "1px solid #F59E0B40",
+                                        }}
+                                    >
+                                        🔧 Dev OTP: <strong>{devOtp}</strong>
+                                    </div>
+                                )}
 
                                 {/* OTP Grid */}
                                 <div className="flex gap-2 mb-4 justify-center">
@@ -331,6 +348,7 @@ export default function LoginPage() {
                                             const result = await requestOTP(identifier.trim());
                                             if (result.success) {
                                                 setExpiresIn(result.expiresInSeconds || 300);
+                                                if (result.devOtp) setDevOtp(result.devOtp);
                                             }
                                         }}
                                         className="w-full text-center text-xs mt-3 py-2"
