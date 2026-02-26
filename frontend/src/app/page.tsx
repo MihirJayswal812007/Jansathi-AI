@@ -358,7 +358,7 @@ export default function HomePage() {
       />
 
       {/* ── Main Content ───────────────────────── */}
-      <main id="chat-content" className="flex flex-col flex-1 overflow-y-auto" role="main" style={{ paddingBottom: "100px" }}>
+      <main id="chat-content" className="flex flex-col flex-1 overflow-y-auto" role="main">
         {!hasMessages ? (
           /* ── Welcome View (Stitch Bento Layout) ──── */
           <motion.div

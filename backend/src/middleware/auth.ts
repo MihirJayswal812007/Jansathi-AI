@@ -94,38 +94,6 @@ export function setSessionCookie(res: Response, token: string) {
     });
 }
 
-export function isAdmin(session: SessionData): boolean {
-    return session.role === "admin";
-}
-
-export async function promoteToAdmin(
-    sessionId: string,
-    secret: string
-): Promise<boolean> {
-    if (!AUTH.adminSecret || secret !== AUTH.adminSecret) return false;
-
-    const session = await prisma.session.findUnique({
-        where: { id: sessionId },
-        select: { userId: true },
-    });
-
-    // Update session role
-    await prisma.session.update({
-        where: { id: sessionId },
-        data: { role: "admin" },
-    });
-
-    // Also update User.role if user is linked
-    if (session?.userId) {
-        await prisma.user.update({
-            where: { id: session.userId },
-            data: { role: "admin" },
-        });
-    }
-
-    logger.info("auth.admin.promoted", { sessionId });
-    return true;
-}
 
 // ── Session Lifecycle ───────────────────────────────────────
 export async function destroySession(sessionId: string): Promise<void> {

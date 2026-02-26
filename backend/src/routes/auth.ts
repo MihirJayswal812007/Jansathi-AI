@@ -8,7 +8,6 @@ import {
     createSession,
     getSession,
     setSessionCookie,
-    promoteToAdmin,
     destroySession,
     clearSessionCookie,
 } from "../middleware/auth";
@@ -27,21 +26,6 @@ authRouter.post("/session", async (req: Request, res: Response) => {
         const existing = await getSession(req);
 
         if (existing) {
-            // Check for admin promotion
-            const { adminSecret } = req.body || {};
-            if (adminSecret) {
-                const promoted = await promoteToAdmin(existing.id, adminSecret);
-                if (promoted) {
-                    logger.info("auth.admin.promoted", { requestId, sessionId: existing.id });
-                    return res.json({
-                        success: true,
-                        session: { ...existing, role: "admin" },
-                        promoted: true,
-                        requestId,
-                    });
-                }
-            }
-
             return res.json({
                 success: true,
                 session: existing,
@@ -156,6 +140,9 @@ authRouter.post("/verify-otp", async (req: Request, res: Response) => {
         // Link authenticated user to session
         await otpService.linkUserToSession(result.userId!, session.id);
 
+        // Re-fetch session to get the correct role from User table
+        const updatedSession = await getSession(req) || session;
+
         // Set cookie
         if (isNew) {
             setSessionCookie(res, session.token);
@@ -167,7 +154,7 @@ authRouter.post("/verify-otp", async (req: Request, res: Response) => {
             success: true,
             message: "Authentication successful",
             session: {
-                ...session,
+                ...updatedSession,
                 userId: result.userId,
             },
             requestId,

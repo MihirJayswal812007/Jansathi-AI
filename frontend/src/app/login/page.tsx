@@ -4,7 +4,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Mail, ArrowRight, ArrowLeft, Shield, Loader2 } from "lucide-react";
 import { requestOTP, verifyOTP } from "@/lib/apiClient";
@@ -14,6 +14,8 @@ type Step = "identifier" | "otp";
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get("redirect") || "/";
     const { setSession } = useUserStore();
 
     const [step, setStep] = useState<Step>("identifier");
@@ -88,7 +90,7 @@ export default function LoginPage() {
             const result = await verifyOTP(identifier.trim(), code);
             if (result.success && result.session) {
                 setSession(result.session.id, result.session.role === "admin");
-                router.push("/");
+                router.push(redirectTo);
             } else {
                 setError(result.message || "Invalid OTP");
                 setOtp(["", "", "", "", "", ""]);

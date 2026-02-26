@@ -76,6 +76,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             <span className="sidebar-label">
                                 {language === "hi" ? item.labelHi : item.label}
                             </span>
+                            {item.auth === "admin" && (
+                                <span className="sidebar-admin-badge">Admin</span>
+                            )}
                         </Link>
                     ))}
                 </nav>

@@ -63,7 +63,6 @@ export const RATE_LIMIT = {
 export const AUTH = {
     sessionCookieName: optionalEnv("SESSION_COOKIE_NAME", "jansathi_sid"),
     sessionMaxAgeSeconds: intEnv("SESSION_MAX_AGE_SECONDS", 30 * 24 * 60 * 60), // 30 days
-    adminSecret: optionalEnv("ADMIN_SECRET", ""),
 } as const;
 
 /** Application */

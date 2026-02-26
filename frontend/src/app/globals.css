@@ -69,6 +69,9 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
+
+  /* Layout measurements */
+  --input-bar-height: 80px;
 }
 
 /* ── Base Styles ──────────────────────────────────────────── */
@@ -243,12 +246,26 @@ h4,
   background: rgba(239, 68, 68, 0.08);
 }
 
+.sidebar-admin-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .app-main {
   flex: 1;
   margin-left: 240px;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  padding-bottom: calc(var(--input-bar-height) + 20px);
 }
 
 /* Tablet: collapsed sidebar (icons only) */
