@@ -529,7 +529,7 @@ export default function DashboardPage() {
                             <div className="space-y-2">
                                 {data.topIntents.slice(0, 5).map((item, i) => (
                                     <div
-                                        key={item.intent}
+                                        key={`${item.intent}-${i}`}
                                         className="flex items-center justify-between p-2 rounded-lg"
                                         style={{ background: "var(--bg-elevated)" }}
                                     >

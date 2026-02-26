@@ -26,6 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { sendChatMessage } from "@/lib/apiClient";
 import { MODE_CONFIGS, APP_NAME, APP_TAGLINE, APP_TAGLINE_HI } from "@/lib/constants";
 import { ChatMessage } from "@/types/modules";
+import { cleanTextForTTS } from "@/lib/cleanTextForTTS";
 
 // ── Main Page Component ──────────────────────────────────────
 export default function HomePage() {
@@ -79,7 +80,7 @@ export default function HomePage() {
     const lastMsg = messages[messages.length - 1];
     if (lastMsg?.role === "assistant" && !isProcessing) {
       playSound("responseReceived");
-      speak(lastMsg.content);
+      speak(cleanTextForTTS(lastMsg.content));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length, isProcessing]);

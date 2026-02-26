@@ -7,6 +7,7 @@
 import { motion } from "framer-motion";
 import { ChatMessage } from "@/types/modules";
 import { MODE_CONFIGS } from "@/lib/constants";
+import { cleanTextForTTS } from "@/lib/cleanTextForTTS";
 
 interface ChatBubbleProps {
     message: ChatMessage;
@@ -145,7 +146,7 @@ export default function ChatBubble({
                 {!isUser && onSpeak && (
                     <button
                         onClick={() =>
-                            isSpeaking ? onStopSpeaking?.() : onSpeak(message.content)
+                            isSpeaking ? onStopSpeaking?.() : onSpeak(cleanTextForTTS(message.content))
                         }
                         className="play-audio-btn"
                         style={{
