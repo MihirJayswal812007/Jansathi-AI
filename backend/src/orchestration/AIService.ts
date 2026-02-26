@@ -8,6 +8,7 @@ import { INTENT_ROUTER_PROMPT } from "../config/prompts";
 import { llmProvider } from "../providers/llm";
 import type { LLMOutput } from "../providers/types";
 import { buildContext } from "../modules";
+import { retrievalService } from "../retrieval";
 import { promptBuilder } from "./PromptBuilder";
 import { outputValidator } from "./OutputValidator";
 import { retryPolicy } from "./RetryPolicy";
@@ -58,6 +59,15 @@ class AIServiceImpl {
             // 1. Build module-specific context
             const moduleContext = await buildContext(request.mode, request.message);
 
+            // 1.5. Retrieve RAG context (if enabled)
+            const ragContext = await retrievalService.retrieve(
+                request.message,
+                request.mode
+            );
+            const fullContext = ragContext
+                ? `${moduleContext}\n\nRelevant Knowledge Base:\n${ragContext}`
+                : moduleContext;
+
             // 2. Sanitize user input
             const sanitizedMessage = outputValidator.sanitizeInput(request.message);
 
@@ -65,7 +75,7 @@ class AIServiceImpl {
             const { systemPrompt, messages } = promptBuilder.buildMessages(
                 {
                     mode: request.mode,
-                    moduleContext,
+                    moduleContext: fullContext,
                     language: request.language,
                     message: sanitizedMessage,
                 },

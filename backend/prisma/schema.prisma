@@ -169,3 +169,18 @@ model DailySnapshot {
   @@index([date])
   @@map("daily_snapshots")
 }
+
+// ── RAG Document Model (pgvector) ──────────────────────────
+model Document {
+  id        String   @id
+  module    String
+  content   String
+  // Prisma doesn't natively support pgvector — column managed via raw SQL migration.
+  // embedding vector(1536) — see prisma/migrations/20260227_add_documents_table/migration.sql
+  metadata  Json     @default("{}")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([module])
+  @@map("documents")
+}
