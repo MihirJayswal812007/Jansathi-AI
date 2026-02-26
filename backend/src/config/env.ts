@@ -75,6 +75,26 @@ export const OTP = {
     rateLimitWindowSeconds: intEnv("OTP_RATE_LIMIT_WINDOW", 600), // 10 minutes
 } as const;
 
+/** SMS — Fast2SMS (India) */
+export const SMS = {
+    fast2smsApiKey: optionalEnv("FAST2SMS_API_KEY", ""),
+    get isConfigured(): boolean {
+        return this.fast2smsApiKey !== "";
+    },
+} as const;
+
+/** Email — SMTP (nodemailer) */
+export const EMAIL = {
+    smtpHost: optionalEnv("SMTP_HOST", ""),
+    smtpPort: intEnv("SMTP_PORT", 587),
+    smtpUser: optionalEnv("SMTP_USER", ""),
+    smtpPass: optionalEnv("SMTP_PASS", ""),
+    smtpFrom: optionalEnv("SMTP_FROM", "JanSathi AI <noreply@jansathi.ai>"),
+    get isConfigured(): boolean {
+        return this.smtpHost !== "" && this.smtpUser !== "" && this.smtpPass !== "";
+    },
+} as const;
+
 /** Application */
 export const APP = {
     name: optionalEnv("APP_NAME", "JanSathi AI"),
