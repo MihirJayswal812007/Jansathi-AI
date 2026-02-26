@@ -3,6 +3,7 @@ import { authMiddleware, requireRole } from "../middleware/rbac";
 import { adminRateLimiter } from "../middleware/rateLimiter";
 import { sendError } from "../middleware/errorHandler";
 import { getDashboardStats, getTrends } from "../services/analytics.service";
+import { searchConversations, getConversationHistory } from "../services/conversation";
 import prisma from "../models/prisma";
 import logger from "../utils/logger";
 
@@ -105,5 +106,59 @@ adminRouter.get("/trends", async (req: Request, res: Response) => {
             error: error instanceof Error ? error.message : String(error),
         });
         sendError(res, "DB_ERROR", "Failed to fetch trends", requestId);
+    }
+});
+
+// GET /api/admin/conversations — Search conversations (filterable, paginated)
+adminRouter.get("/conversations", async (req: Request, res: Response) => {
+    const requestId = logger.generateRequestId();
+
+    try {
+        const page = Math.max(1, parseInt(req.query.page as string) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+        const mode = req.query.mode as string | undefined;
+        const resolved = req.query.resolved === "true" ? true : req.query.resolved === "false" ? false : undefined;
+
+        const result = await searchConversations({ mode, resolved, page, limit });
+
+        res.json({
+            success: true,
+            data: result.conversations,
+            pagination: {
+                page,
+                limit,
+                total: result.total,
+                totalPages: Math.ceil(result.total / limit),
+            },
+            requestId,
+        });
+    } catch (error) {
+        logger.error("api.admin.conversations.list.error", {
+            requestId,
+            error: error instanceof Error ? error.message : String(error),
+        });
+        sendError(res, "DB_ERROR", "Failed to fetch conversations", requestId);
+    }
+});
+
+// GET /api/admin/conversations/:id — Conversation detail with messages
+adminRouter.get("/conversations/:id", async (req: Request, res: Response) => {
+    const requestId = logger.generateRequestId();
+
+    try {
+        const id = req.params.id as string;
+        const conversation = await getConversationHistory(id);
+
+        if (!conversation) {
+            return sendError(res, "INVALID_INPUT", "Conversation not found", requestId);
+        }
+
+        res.json({ success: true, data: conversation, requestId });
+    } catch (error) {
+        logger.error("api.admin.conversations.detail.error", {
+            requestId,
+            error: error instanceof Error ? error.message : String(error),
+        });
+        sendError(res, "DB_ERROR", "Failed to fetch conversation", requestId);
     }
 });

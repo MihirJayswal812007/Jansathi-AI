@@ -329,3 +329,45 @@ export async function fetchTrends(days = 7): Promise<TrendData> {
     }
     return json.data;
 }
+
+// ── Admin Conversation API ──────────────────────────────────
+
+export interface AdminConversationSummary {
+    id: string;
+    mode: string;
+    satisfaction: number | null;
+    resolved: boolean;
+    startedAt: string;
+    endedAt: string | null;
+    messageCount: number;
+    userName: string | null;
+}
+
+/** Fetch admin conversation list with optional filters. */
+export async function fetchAdminConversations(
+    filters: { mode?: string; resolved?: string; page?: number } = {}
+): Promise<{ data: AdminConversationSummary[]; pagination: { page: number; total: number; totalPages: number } }> {
+    const params = new URLSearchParams();
+    if (filters.page) params.set("page", String(filters.page));
+    if (filters.mode) params.set("mode", filters.mode);
+    if (filters.resolved) params.set("resolved", filters.resolved);
+
+    const res = await fetch(`${API_BASE}/api/admin/conversations?${params}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Admin conversations error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to load conversations");
+    return { data: json.data, pagination: json.pagination };
+}
+
+/** Fetch a single conversation detail (admin). */
+export async function fetchAdminConversationDetail(id: string): Promise<ConversationDetail> {
+    const res = await fetch(`${API_BASE}/api/admin/conversations/${id}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Admin conversation detail error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to load conversation");
+    return json.data;
+}

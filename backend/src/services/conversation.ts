@@ -83,6 +83,72 @@ export async function listConversations(
     };
 }
 
+// ── Admin Search Conversations (all users, filterable) ──────
+export interface AdminConversationSummary extends ConversationSummary {
+    userName: string | null;
+}
+
+export interface ConversationSearchFilters {
+    mode?: string;
+    resolved?: boolean;
+    startedAfter?: Date;
+    startedBefore?: Date;
+    page?: number;
+    limit?: number;
+}
+
+export async function searchConversations(
+    filters: ConversationSearchFilters = {}
+): Promise<{ conversations: AdminConversationSummary[]; total: number }> {
+    const page = filters.page || 1;
+    const limit = Math.min(50, Math.max(1, filters.limit || 20));
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = {};
+    if (filters.mode) where.mode = filters.mode;
+    if (filters.resolved !== undefined) where.resolved = filters.resolved;
+    if (filters.startedAfter || filters.startedBefore) {
+        where.startedAt = {
+            ...(filters.startedAfter ? { gte: filters.startedAfter } : {}),
+            ...(filters.startedBefore ? { lte: filters.startedBefore } : {}),
+        };
+    }
+
+    const [conversations, total] = await Promise.all([
+        prisma.conversation.findMany({
+            where,
+            orderBy: { startedAt: "desc" },
+            skip,
+            take: limit,
+            select: {
+                id: true,
+                mode: true,
+                satisfaction: true,
+                resolved: true,
+                startedAt: true,
+                endedAt: true,
+                _count: { select: { messages: true } },
+                user: { select: { name: true } },
+            },
+        }),
+        prisma.conversation.count({ where }),
+    ]);
+
+    return {
+        conversations: conversations.map((c) => ({
+            id: c.id,
+            mode: c.mode,
+            satisfaction: c.satisfaction,
+            resolved: c.resolved,
+            startedAt: c.startedAt,
+            endedAt: c.endedAt,
+            messageCount: c._count.messages,
+            userName: c.user?.name || null,
+        })),
+        total,
+    };
+}
+
 // ── Create Conversation ─────────────────────────────────────
 export async function createConversation(
     input: ConversationCreateInput

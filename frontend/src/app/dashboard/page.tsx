@@ -308,18 +308,27 @@ export default function DashboardPage() {
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={loadData}
-                        disabled={loading}
-                        className="p-2 rounded-lg"
-                        style={{ background: "var(--bg-surface)" }}
-                    >
-                        <RefreshCw
-                            size={16}
-                            className={loading ? "animate-spin" : ""}
-                            style={{ color: "var(--text-secondary)" }}
-                        />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/dashboard/conversations"
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5"
+                            style={{ background: "var(--bg-surface)", color: "var(--text-secondary)" }}
+                        >
+                            <MessageSquare size={14} /> Conversations
+                        </Link>
+                        <button
+                            onClick={loadData}
+                            disabled={loading}
+                            className="p-2 rounded-lg"
+                            style={{ background: "var(--bg-surface)" }}
+                        >
+                            <RefreshCw
+                                size={16}
+                                className={loading ? "animate-spin" : ""}
+                                style={{ color: "var(--text-secondary)" }}
+                            />
+                        </button>
+                    </div>
                 </header>
 
                 {loading && !data ? (
