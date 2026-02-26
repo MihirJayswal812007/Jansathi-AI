@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import ClientShell from "@/components/common/ClientShell";
 
 export const metadata: Metadata = {
   title: "JanSathi AI — Your Digital Companion",
@@ -45,7 +46,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        {children}
+        <ClientShell>
+          {children}
+        </ClientShell>
         <script
           dangerouslySetInnerHTML={{
             __html: `

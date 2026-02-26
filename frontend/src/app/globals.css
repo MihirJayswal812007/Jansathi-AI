@@ -61,6 +61,14 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 9999px;
+
+  /* Spacing rhythm */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
 }
 
 /* ── Base Styles ──────────────────────────────────────────── */
@@ -115,6 +123,181 @@ h4,
   -webkit-backdrop-filter: blur(12px);
 }
 
+/* ── App Shell + Sidebar ─────────────────────────────────── */
+.app-shell {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.sidebar-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(37, 99, 235, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-item:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.sidebar-item.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #3B82F6;
+}
+
+.sidebar-item.active .sidebar-icon {
+  color: #3B82F6;
+}
+
+.sidebar-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.sidebar-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-footer {
+  padding: 12px 8px 16px;
+  border-top: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-lang {
+  padding: 8px 14px;
+}
+
+.sidebar-logout {
+  color: var(--text-muted);
+}
+
+.sidebar-logout:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.app-main {
+  flex: 1;
+  margin-left: 240px;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tablet: collapsed sidebar (icons only) */
+@media (max-width: 1023px) and (min-width: 640px) {
+  .sidebar {
+    width: 64px;
+  }
+
+  .sidebar-brand,
+  .sidebar-label,
+  .sidebar-lang {
+    display: none;
+  }
+
+  .sidebar-header {
+    justify-content: center;
+    padding: 16px 8px;
+  }
+
+  .sidebar-nav {
+    padding: 12px 4px;
+  }
+
+  .sidebar-item {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .sidebar-footer {
+    padding: 8px 4px 12px;
+    align-items: center;
+  }
+
+  .app-main {
+    margin-left: 64px;
+  }
+}
+
+/* Mobile: sidebar hidden */
+@media (max-width: 639px) {
+  .sidebar {
+    display: none;
+  }
+
+  .app-main {
+    margin-left: 0;
+  }
+}
+
 /* ── Sticky Header ────────────────────────────────────────── */
 .app-header {
   position: sticky;
@@ -133,6 +316,31 @@ h4,
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+/* ── Mobile Nav Breakpoint ────────────────────────────────── */
+@media (max-width: 639px) {
+
+  /* Hide all inline nav items on mobile */
+  .nav-desktop .mode-badge,
+  .nav-desktop .glass-card,
+  .nav-desktop .lang-toggle {
+    display: none !important;
+  }
+
+  /* Show hamburger on mobile */
+  .nav-hamburger {
+    display: flex !important;
+  }
+
+  /* Tighter header padding on mobile */
+  .app-header {
+    padding: 10px 14px;
+  }
+
+  .app-header h1 {
+    font-size: 1rem;
+  }
 }
 
 /* ── Voice Button V2 (Glowing, Centered) ──────────────────── */
@@ -472,11 +680,25 @@ h4,
 .input-bar {
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 240px;
   right: 0;
   padding: 16px 24px;
   background: linear-gradient(to top, var(--bg-primary) 60%, transparent);
   z-index: 40;
+}
+
+/* Tablet: input bar starts after collapsed sidebar */
+@media (max-width: 1023px) and (min-width: 640px) {
+  .input-bar {
+    left: 64px;
+  }
+}
+
+/* Mobile: input bar full width */
+@media (max-width: 639px) {
+  .input-bar {
+    left: 0;
+  }
 }
 
 .input-bar-inner {

@@ -23,7 +23,8 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
     useEffect(() => {
         if (isLoading) return;
         if (!isAuthenticated) {
-            router.replace("/login");
+            const redirectTo = typeof window !== "undefined" ? window.location.pathname : "/";
+            router.replace(`/login?redirect=${encodeURIComponent(redirectTo)}`);
         }
     }, [isAuthenticated, isLoading, router]);
 

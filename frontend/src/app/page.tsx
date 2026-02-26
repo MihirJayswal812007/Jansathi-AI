@@ -14,6 +14,7 @@ import QuickActions from "@/components/common/QuickActions";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import LoadingDots from "@/components/common/LoadingDots";
 import ModulePanel from "@/components/common/ModulePanel";
+import MobileMenu from "@/components/common/MobileMenu";
 import FeedbackBar from "@/components/chat/FeedbackBar";
 
 import { useModeStore } from "@/store/modeStore";
@@ -36,6 +37,7 @@ export default function HomePage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [textInput, setTextInput] = useState("");
   const [voiceModeActive, setVoiceModeActive] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const activeModeConfig = activeMode ? MODE_CONFIGS[activeMode] : null;
 
@@ -225,7 +227,28 @@ export default function HomePage() {
             </h1>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            {/* Hamburger button — mobile only */}
+            <button
+              className="nav-hamburger"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label={language === "hi" ? "मेनू खोलें" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+              style={{
+                padding: "8px",
+                borderRadius: "var(--radius-sm)",
+                border: "none",
+                background: "var(--bg-surface)",
+                color: "var(--text-secondary)",
+                cursor: "pointer",
+                display: "none",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: "24px" }}>menu</span>
+            </button>
             {/* Mode badge pill */}
             {activeModeConfig && (
               <div className="mode-badge" style={{
@@ -320,8 +343,22 @@ export default function HomePage() {
         </div>
       </header>
 
+      {/* Mobile menu */}
+      <MobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        language={language}
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
+        onHomeClick={() => {
+          clearMessages();
+          setActiveMode(null);
+          window.scrollTo(0, 0);
+        }}
+      />
+
       {/* ── Main Content ───────────────────────── */}
-      <main id="chat-content" className="flex flex-col flex-1 overflow-hidden" role="main">
+      <main id="chat-content" className="flex flex-col flex-1 overflow-y-auto" role="main" style={{ paddingBottom: "100px" }}>
         {!hasMessages ? (
           /* ── Welcome View (Stitch Bento Layout) ──── */
           <motion.div
