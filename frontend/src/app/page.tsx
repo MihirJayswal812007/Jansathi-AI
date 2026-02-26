@@ -258,17 +258,30 @@ export default function HomePage() {
               </span>
             </Link>
             {isAuthenticated ? (
-              <button
-                onClick={handleLogout}
-                className="glass-card"
-                style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "none" }}
-                title={language === "hi" ? "लॉग आउट" : "Logout"}
-                aria-label="Logout"
-              >
-                <span className="material-symbols-outlined" style={{ color: "#10B981", fontSize: "20px" }}>
-                  person
-                </span>
-              </button>
+              <>
+                <Link
+                  href="/profile"
+                  className="glass-card"
+                  style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                  title={language === "hi" ? "प्रोफ़ाइल" : "Profile"}
+                  aria-label="View profile"
+                >
+                  <span className="material-symbols-outlined" style={{ color: "#10B981", fontSize: "20px" }}>
+                    person
+                  </span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="glass-card"
+                  style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "none" }}
+                  title={language === "hi" ? "लॉग आउट" : "Logout"}
+                  aria-label="Logout"
+                >
+                  <span className="material-symbols-outlined" style={{ color: "var(--text-muted)", fontSize: "20px" }}>
+                    logout
+                  </span>
+                </button>
+              </>
             ) : (
               <Link
                 href="/login"

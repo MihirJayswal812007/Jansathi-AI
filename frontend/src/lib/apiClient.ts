@@ -6,7 +6,6 @@ import { ChatMessage, ModeName } from "@/types/modules";
 // When NEXT_PUBLIC_API_URL is set, requests go to the external backend.
 // When empty (default), requests go to same-origin Next.js API routes.
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || "";
 
 // ── Chat API ────────────────────────────────────────────────
 
@@ -126,35 +125,89 @@ export async function logout(): Promise<void> {
     });
 }
 
-// ── Admin API ───────────────────────────────────────────────
+// ── User API ─────────────────────────────────────────────────────
 
-/** Ensure we have an admin session via cookie. Returns true if admin. */
-export async function ensureAdminSession(): Promise<boolean> {
-    try {
-        // Step 1: Create or retrieve session
-        await fetch(`${API_BASE}/api/auth/session`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({}),
-        });
-
-        // Step 2: Promote to admin using secret
-        if (ADMIN_SECRET) {
-            const promoRes = await fetch(`${API_BASE}/api/auth/session`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ adminSecret: ADMIN_SECRET }),
-            });
-            const promoData = await promoRes.json();
-            return promoData.promoted === true || promoData.session?.role === "admin";
-        }
-        return false;
-    } catch {
-        return false;
-    }
+export interface UserProfile {
+    id: string;
+    phone: string | null;
+    email: string | null;
+    name: string | null;
+    role: string;
+    language: string;
+    village: string | null;
+    district: string | null;
+    state: string | null;
+    pincode: string | null;
+    age: number | null;
+    gender: string | null;
+    category: string | null;
+    occupation: string | null;
+    createdAt: string;
+    lastActiveAt: string;
 }
+
+export interface UserPreferences {
+    favoriteModules: string[];
+    voiceEnabled: boolean;
+    fontSize: string;
+    language: string;
+}
+
+/** Fetch current user's profile. */
+export async function fetchProfile(): Promise<UserProfile> {
+    const res = await fetch(`${API_BASE}/api/user/profile`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Profile API error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to load profile");
+    return json.data;
+}
+
+/** Update current user's profile fields. */
+export async function updateProfile(
+    data: Partial<Pick<UserProfile, "name" | "language" | "village" | "district" | "state" | "pincode" | "age" | "gender" | "category" | "occupation">>
+): Promise<UserProfile> {
+    const res = await fetch(`${API_BASE}/api/user/profile`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`Profile update error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to update profile");
+    return json.data;
+}
+
+/** Fetch current user's preferences. */
+export async function fetchPreferences(): Promise<UserPreferences> {
+    const res = await fetch(`${API_BASE}/api/user/preferences`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Preferences API error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to load preferences");
+    return json.data;
+}
+
+/** Update current user's preferences. */
+export async function updatePreferences(
+    data: Partial<UserPreferences>
+): Promise<UserPreferences> {
+    const res = await fetch(`${API_BASE}/api/user/preferences`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`Preferences update error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to update preferences");
+    return json.data;
+}
+
+// ── Admin API ───────────────────────────────────────────────
 
 /** Dashboard stats from the admin endpoint. */
 export interface DashboardData {
