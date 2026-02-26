@@ -6,6 +6,7 @@ import { authMiddleware } from "../middleware/rbac";
 import { rateLimitMiddleware } from "../middleware/rateLimiter";
 import { sendError } from "../middleware/errorHandler";
 import { userService } from "../services/user.service";
+import { listConversations, getConversationHistory } from "../services/conversation";
 import logger from "../utils/logger";
 
 export const userRouter = Router();
@@ -105,6 +106,68 @@ userRouter.patch("/preferences", async (req: Request, res: Response) => {
             return sendError(res, "INVALID_INPUT", message, requestId);
         }
         logger.error("api.user.preferences.update.error", { requestId, error: message });
+        sendError(res, "INTERNAL_ERROR", undefined, requestId);
+    }
+});
+
+// GET /api/user/conversations — List user's conversations (paginated)
+userRouter.get("/conversations", async (req: Request, res: Response) => {
+    const requestId = logger.generateRequestId();
+
+    try {
+        const userId = req.session?.userId;
+        if (!userId) {
+            return sendError(res, "UNAUTHORIZED", "User not linked to session", requestId);
+        }
+
+        const page = Math.max(1, parseInt(req.query.page as string) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+
+        const result = await listConversations(userId, page, limit);
+
+        res.json({
+            success: true,
+            data: result.conversations,
+            pagination: {
+                page,
+                limit,
+                total: result.total,
+                totalPages: Math.ceil(result.total / limit),
+            },
+            requestId,
+        });
+    } catch (error) {
+        logger.error("api.user.conversations.list.error", {
+            requestId,
+            error: error instanceof Error ? error.message : String(error),
+        });
+        sendError(res, "INTERNAL_ERROR", undefined, requestId);
+    }
+});
+
+// GET /api/user/conversations/:id — Get conversation detail with messages
+userRouter.get("/conversations/:id", async (req: Request, res: Response) => {
+    const requestId = logger.generateRequestId();
+
+    try {
+        const userId = req.session?.userId;
+        if (!userId) {
+            return sendError(res, "UNAUTHORIZED", "User not linked to session", requestId);
+        }
+
+        const id = req.params.id as string;
+        const conversation = await getConversationHistory(id);
+
+        if (!conversation) {
+            return sendError(res, "INVALID_INPUT", "Conversation not found", requestId);
+        }
+
+        res.json({ success: true, data: conversation, requestId });
+    } catch (error) {
+        logger.error("api.user.conversations.detail.error", {
+            requestId,
+            error: error instanceof Error ? error.message : String(error),
+        });
         sendError(res, "INTERNAL_ERROR", undefined, requestId);
     }
 });

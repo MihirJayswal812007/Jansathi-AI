@@ -264,6 +264,19 @@ export default function HomePage() {
                 dashboard
               </span>
             </Link>
+            {isAuthenticated && (
+              <Link
+                href="/history"
+                className="glass-card"
+                style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                title={language === "hi" ? "इतिहास" : "History"}
+                aria-label="Conversation history"
+              >
+                <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
+                  history
+                </span>
+              </Link>
+            )}
             {isAuthenticated ? (
               <>
                 <Link

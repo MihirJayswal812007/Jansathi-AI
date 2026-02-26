@@ -32,6 +32,57 @@ export interface ConversationWithMessages {
     }>;
 }
 
+export interface ConversationSummary {
+    id: string;
+    mode: string;
+    satisfaction: number | null;
+    resolved: boolean;
+    startedAt: Date;
+    endedAt: Date | null;
+    messageCount: number;
+}
+
+// ── List Conversations (paginated) ──────────────────────────
+export async function listConversations(
+    userId: string,
+    page = 1,
+    limit = 20
+): Promise<{ conversations: ConversationSummary[]; total: number }> {
+    const skip = (page - 1) * limit;
+
+    const [conversations, total] = await Promise.all([
+        prisma.conversation.findMany({
+            where: { userId },
+            orderBy: { startedAt: "desc" },
+            skip,
+            take: limit,
+            select: {
+                id: true,
+                mode: true,
+                satisfaction: true,
+                resolved: true,
+                startedAt: true,
+                endedAt: true,
+                _count: { select: { messages: true } },
+            },
+        }),
+        prisma.conversation.count({ where: { userId } }),
+    ]);
+
+    return {
+        conversations: conversations.map((c) => ({
+            id: c.id,
+            mode: c.mode,
+            satisfaction: c.satisfaction,
+            resolved: c.resolved,
+            startedAt: c.startedAt,
+            endedAt: c.endedAt,
+            messageCount: c._count.messages,
+        })),
+        total,
+    };
+}
+
 // ── Create Conversation ─────────────────────────────────────
 export async function createConversation(
     input: ConversationCreateInput

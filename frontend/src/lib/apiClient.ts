@@ -73,6 +73,48 @@ export async function submitFeedback(
     return res.json();
 }
 
+// ── Conversation History API ────────────────────────────────
+
+export interface ConversationSummary {
+    id: string;
+    mode: string;
+    satisfaction: number | null;
+    resolved: boolean;
+    startedAt: string;
+    endedAt: string | null;
+    messageCount: number;
+}
+
+export interface ConversationDetail {
+    id: string;
+    mode: string;
+    messages: Array<{ role: string; content: string; timestamp: string }>;
+}
+
+/** Fetch paginated list of user's conversations. */
+export async function fetchConversations(
+    page = 1
+): Promise<{ data: ConversationSummary[]; pagination: { page: number; total: number; totalPages: number } }> {
+    const res = await fetch(`${API_BASE}/api/user/conversations?page=${page}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Conversations API error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to load conversations");
+    return { data: json.data, pagination: json.pagination };
+}
+
+/** Fetch a single conversation with all messages. */
+export async function fetchConversationDetail(id: string): Promise<ConversationDetail> {
+    const res = await fetch(`${API_BASE}/api/user/conversations/${id}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Conversation detail error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to load conversation");
+    return json.data;
+}
+
 // ── Auth API ────────────────────────────────────────────────
 
 export interface SessionInfo {
