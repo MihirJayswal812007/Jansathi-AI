@@ -88,4 +88,8 @@ export type { RetrievedDocument, IVectorStore, DocumentUpsert } from "./types";
 export { RetrievalService } from "./RetrievalService";
 export { ConversationMemoryService } from "./ConversationMemoryService";
 export { compressContext, estimateTokens } from "./contextCompressor";
-
+export { CachedEmbeddingProvider } from "./EmbeddingCache";
+export { MemoryPruner, memoryPruner } from "./MemoryPruner";
+export { MemorySummarizer } from "./MemorySummarizer";
+export { Reranker, reranker } from "./Reranker";
+export { estimateTokensFast, estimateTokensStrict } from "./tokenizer";

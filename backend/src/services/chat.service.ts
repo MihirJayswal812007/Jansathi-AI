@@ -93,19 +93,15 @@ export async function handleChat(
     if (session.userId) {
         userService.updateLastActive(session.userId);
 
-        // 6.5 Store conversation turns in semantic memory (fire-and-forget)
+        // 6.5 Store user message in semantic memory (fire-and-forget)
+        // Only user messages are stored — they are the semantic anchors for
+        // future retrieval. Assistant responses are regenerated contextually
+        // and would waste embedding calls + storage.
         conversationMemoryService.store({
             userId: session.userId,
             conversationId: conversationId ?? undefined,
             role: "user",
             content: message,
-            module: activeMode,
-        });
-        conversationMemoryService.store({
-            userId: session.userId,
-            conversationId: conversationId ?? undefined,
-            role: "assistant",
-            content: aiResult.content,
             module: activeMode,
         });
     }

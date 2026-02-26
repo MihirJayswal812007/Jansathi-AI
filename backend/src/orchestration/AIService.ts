@@ -9,6 +9,8 @@ import { llmProvider } from "../providers/llm";
 import type { LLMOutput } from "../providers/types";
 import { buildContext } from "../modules";
 import { retrievalService, conversationMemoryService } from "../retrieval";
+import { MemorySummarizer } from "../retrieval/MemorySummarizer";
+import { embeddingProvider } from "../providers/embedding";
 import { promptBuilder } from "./PromptBuilder";
 import { outputValidator } from "./OutputValidator";
 import { retryPolicy } from "./RetryPolicy";
@@ -20,6 +22,13 @@ import logger from "../utils/logger";
 
 // ── Constants ───────────────────────────────────────────────
 const MAX_TOOL_ROUNDS = 3;
+
+// ── Memory Summarizer Singleton ─────────────────────────────
+const memorySummarizer = new MemorySummarizer(embeddingProvider, {
+    enabled: (process.env.ENABLE_MEMORY_SUMMARIZER || "").toLowerCase() === "true",
+    triggerThreshold: parseInt(process.env.MEMORY_SUMMARIZE_THRESHOLD || "100", 10),
+    batchSize: parseInt(process.env.MEMORY_SUMMARIZE_BATCH || "30", 10),
+});
 
 // ── Request ID Generator ────────────────────────────────────
 function generateRequestId(): string {
@@ -80,6 +89,15 @@ class AIServiceImpl {
                 ? `${fullContext}\n\nRelevant Past Conversations:\n${memoryContext}`
                 : fullContext;
 
+            // 1.8. Inject long-term user profile summary (if available)
+            let finalContext = enrichedContext;
+            if (request.userId && memorySummarizer.config.enabled) {
+                const summary = await memorySummarizer.retrieveSummary(request.userId);
+                if (summary) {
+                    finalContext = `${enrichedContext}\n\nLong-term Profile Summary:\n${summary}`;
+                }
+            }
+
             // 2. Sanitize user input
             const sanitizedMessage = outputValidator.sanitizeInput(request.message);
 
@@ -87,7 +105,7 @@ class AIServiceImpl {
             const { systemPrompt, messages } = promptBuilder.buildMessages(
                 {
                     mode: request.mode,
-                    moduleContext: enrichedContext,
+                    moduleContext: finalContext,
                     language: request.language,
                     message: sanitizedMessage,
                 },
@@ -195,6 +213,11 @@ class AIServiceImpl {
 
             // Note: memory storage happens in chat.service.ts after message persistence
             // to avoid storing messages that fail to persist.
+
+            // Trigger async memory summarization (fire-and-forget)
+            if (request.userId) {
+                memorySummarizer.summarizeIfNeeded(request.userId).catch(() => { });
+            }
         } catch (error) {
             const durationMs = Date.now() - startTime;
 

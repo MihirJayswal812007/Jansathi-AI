@@ -1,18 +1,12 @@
 // ===== JanSathi AI — Context Compressor =====
 // Token-aware trimming of retrieved documents to fit within token budget.
-// Uses ~4 chars/token heuristic (good for mixed Hindi/English).
+// Uses Hindi-aware tokenizer (replaces old 4 chars/token heuristic).
 
 import type { RetrievedDocument } from "./types";
+import { estimateTokens as tokenize } from "./tokenizer";
 
-const CHARS_PER_TOKEN = 4;
-
-/**
- * Estimate token count from character length.
- * Uses 4 chars/token heuristic — conservative for Devanagari + English.
- */
-export function estimateTokens(text: string): number {
-    return Math.ceil(text.length / CHARS_PER_TOKEN);
-}
+// Re-export for backward compatibility (tests import from here)
+export { estimateTokens } from "./tokenizer";
 
 /**
  * Compress retrieved documents into a token-budget-aware context string.
@@ -38,7 +32,7 @@ export function compressContext(
     for (let i = 0; i < docs.length; i++) {
         const doc = docs[i];
         const formatted = `[${i + 1}] ${doc.content.trim()}`;
-        const tokenCost = estimateTokens(formatted);
+        const tokenCost = tokenize(formatted);
 
         if (usedTokens + tokenCost > maxTokenBudget) break;
 

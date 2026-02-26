@@ -1,9 +1,11 @@
 // ===== JanSathi AI — Embedding Provider Registry =====
 // Exports a configured IEmbeddingProvider based on environment.
+// Optionally wraps with LRU+TTL EmbeddingCache.
 // Returns null if no embedding API key is available.
 
 import type { IEmbeddingProvider } from "./IEmbeddingProvider";
 import { GroqEmbeddingProvider } from "./GroqEmbeddingProvider";
+import { CachedEmbeddingProvider } from "../../retrieval/EmbeddingCache";
 import logger from "../../utils/logger";
 
 export type { IEmbeddingProvider } from "./IEmbeddingProvider";
@@ -21,13 +23,33 @@ function createEmbeddingProvider(): IEmbeddingProvider | null {
         return null;
     }
 
+    const inner = new GroqEmbeddingProvider({ apiKey, model, dimensions, baseUrl });
+
+    // Wrap with cache if enabled
+    const cacheEnabled = (process.env.ENABLE_EMBEDDING_CACHE || "").toLowerCase() === "true";
+    const cacheTtlMs = parseInt(process.env.EMBEDDING_CACHE_TTL_MS || "600000", 10); // 10 min
+    const cacheMaxSize = parseInt(process.env.EMBEDDING_CACHE_MAX_SIZE || "500", 10);
+
+    if (cacheEnabled) {
+        logger.info("embedding.cache.enabled", {
+            ttlMs: cacheTtlMs,
+            maxSize: cacheMaxSize,
+        });
+
+        return new CachedEmbeddingProvider(inner, {
+            enabled: true,
+            maxSize: cacheMaxSize,
+            ttlMs: cacheTtlMs,
+        });
+    }
+
     logger.info("embedding.provider.configured", {
         model,
         dimensions,
-        baseUrl: baseUrl.replace(/\/\/.*@/, "//<redacted>@"),
+        cache: false,
     });
 
-    return new GroqEmbeddingProvider({ apiKey, model, dimensions, baseUrl });
+    return inner;
 }
 
 /** Configured embedding provider (null if no API key) */
