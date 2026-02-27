@@ -19,7 +19,20 @@ export default function Error({
     const digest = error?.digest;
 
     useEffect(() => {
-        if (error) console.error("[JanSathi Error Boundary]", error);
+        if (!error) return;
+        console.error("[JanSathi Error Boundary]", error);
+        // ChunkLoadError = stale JS chunks after dev server restart → auto-reload once
+        if (
+            error.name === "ChunkLoadError" ||
+            error.message?.includes("Loading chunk") ||
+            error.message?.includes("Failed to load chunk")
+        ) {
+            const key = "chunk-reload-attempted";
+            if (!sessionStorage.getItem(key)) {
+                sessionStorage.setItem(key, "1");
+                window.location.reload();
+            }
+        }
     }, [error]);
 
     return (
