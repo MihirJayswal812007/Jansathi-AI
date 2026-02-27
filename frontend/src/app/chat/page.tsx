@@ -33,7 +33,7 @@ export default function HomePage() {
   const { activeMode, language, isProcessing, setActiveMode, setIsProcessing } =
     useModeStore();
   const { messages, addMessage, clearMessages, conversationId, setConversationId } = useChatStore();
-  const { isAuthenticated, handleLogout } = useAuth();
+  const { isAuthenticated, isAdmin, handleLogout } = useAuth();
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [textInput, setTextInput] = useState("");
@@ -277,17 +277,19 @@ export default function HomePage() {
                 home
               </span>
             </button>
-            <Link
-              href="/admin/dashboard"
-              className="glass-card"
-              style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
-              title="CommPulse Dashboard (Admin)"
-              aria-label="Open admin analytics dashboard"
-            >
-              <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
-                dashboard
-              </span>
-            </Link>
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="glass-card"
+                style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                title="CommPulse Dashboard (Admin)"
+                aria-label="Open admin analytics dashboard"
+              >
+                <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
+                  dashboard
+                </span>
+              </Link>
+            )}
             {isAuthenticated && (
               <Link
                 href="/history"
@@ -371,9 +373,8 @@ export default function HomePage() {
           >
             {/* Hero Section */}
             <section style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "40px 0 32px" }}>
-              {/* Glowing Voice Button */}
+              {/* Voice Orb Button */}
               <div style={{ position: "relative" }}>
-                <div className="voice-glow" />
                 {voiceSupported && (
                   <VoiceButton
                     isListening={isListening}
