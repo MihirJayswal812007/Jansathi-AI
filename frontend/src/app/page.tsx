@@ -1,615 +1,367 @@
-// ===== JanSathi AI — Home Page (V2 Stitch Design) =====
-// Premium voice-first interface with glassmorphism, bento grid, and color psychology
+// ===== JanSathi AI — Landing Page =====
+// Investor-demo-ready landing page communicating trust, intelligence, and social impact.
+// 7 sections: Hero, Problem, Pipeline, Intelligence Stack, Features, Trust, CTA.
 
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 
-import VoiceButton from "@/components/common/VoiceButton";
-import ModeSelector from "@/components/common/ModeSelector";
-import ChatBubble from "@/components/common/ChatBubble";
-import QuickActions from "@/components/common/QuickActions";
-import LanguageSwitcher from "@/components/common/LanguageSwitcher";
-import LoadingDots from "@/components/common/LoadingDots";
-import ModulePanel from "@/components/common/ModulePanel";
-import MobileMenu from "@/components/common/MobileMenu";
-import FeedbackBar from "@/components/chat/FeedbackBar";
+// 3D background — loaded only client-side (no SSR, no hydration mismatch)
+const LandingBackground = dynamic(
+  () => import("@/components/3d/LandingBackground"),
+  { ssr: false, loading: () => null }
+);
 
-import { useModeStore } from "@/store/modeStore";
-import { useChatStore } from "@/store/chatStore";
-import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
-import { useTextToSpeech } from "@/hooks/useTextToSpeech";
-import { useAudioFeedback } from "@/hooks/useAudioFeedback";
-import { useAuth } from "@/hooks/useAuth";
-import { sendChatMessage } from "@/lib/apiClient";
-import { MODE_CONFIGS, APP_NAME, APP_TAGLINE, APP_TAGLINE_HI } from "@/lib/constants";
-import { ChatMessage } from "@/types/modules";
-import { cleanTextForTTS } from "@/lib/cleanTextForTTS";
+// ── Animation Variants ──────────────────────────────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }
+  })
+};
 
-// ── Main Page Component ──────────────────────────────────────
-export default function HomePage() {
-  const { activeMode, language, isProcessing, setActiveMode, setIsProcessing } =
-    useModeStore();
-  const { messages, addMessage, clearMessages, conversationId, setConversationId } = useChatStore();
-  const { isAuthenticated, handleLogout } = useAuth();
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [textInput, setTextInput] = useState("");
-  const [voiceModeActive, setVoiceModeActive] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const stagger = {
+  visible: { transition: { staggerChildren: 0.1 } }
+};
 
-  const activeModeConfig = activeMode ? MODE_CONFIGS[activeMode] : null;
+// ── Data ────────────────────────────────────────────────────
+const PIPELINE_STEPS = [
+  { icon: "search", label: "Your Question", desc: "Ask in Hindi or English, text or voice", color: "#94A3B8" },
+  { icon: "library_books", label: "Knowledge Retrieval", desc: "Semantic search across verified scheme documents", color: "#3B82F6" },
+  { icon: "psychology", label: "Conversation Memory", desc: "Personal context from your past interactions", color: "#8B5CF6" },
+  { icon: "auto_awesome", label: "AI Response", desc: "Grounded, verified, personalized answer", color: "#10B981" },
+];
 
-  // Audio feedback
-  const { playSound } = useAudioFeedback();
+const INTEL_CARDS = [
+  { icon: "library_books", title: "Static Knowledge (RAG)", desc: "1,500+ government scheme documents indexed with pgvector semantic search. Every answer is grounded in verified data.", color: "var(--intel-rag)" },
+  { icon: "psychology", title: "Conversation Memory", desc: "Your past interactions inform future responses. The AI remembers your context, eligibility, and preferences.", color: "var(--intel-memory)" },
+  { icon: "person_search", title: "Long-term Profile", desc: "LLM-generated user profiles summarize your patterns over time for deeply personalized guidance.", color: "var(--intel-profile)" },
+  { icon: "swap_vert", title: "Smart Reranking", desc: "Cross-encoder reranking ensures the most relevant documents surface first, not just the highest similarity.", color: "var(--intel-reranker)" },
+];
 
-  // Voice recognition
-  const handleVoiceResult = useCallback(
-    (transcript: string) => {
-      playSound("stopListening");
-      handleSendMessage(transcript);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeMode]
-  );
+const FEATURES = [
+  { icon: "translate", title: "Multilingual", desc: "Hindi & English with Devanagari-optimized tokenization" },
+  { icon: "mic", title: "Voice-First", desc: "Speak naturally — the AI understands spoken Hindi" },
+  { icon: "verified_user", title: "Secure OTP Auth", desc: "Phone-based authentication, no passwords to remember" },
+  { icon: "speed", title: "Redis Scaling", desc: "Rate limiting and caching for production-grade performance" },
+  { icon: "analytics", title: "Built-in Analytics", desc: "Usage tracking, token budgets, and retrieval metrics" },
+  { icon: "memory", title: "Embedding Cache", desc: "LRU+TTL cache reduces API costs by 50% on repeated queries" },
+];
 
-  const {
-    isListening,
-    interimTranscript,
-    startListening,
-    stopListening,
-    isSupported: voiceSupported,
-  } = useVoiceRecognition({
-    language,
-    onResult: handleVoiceResult,
-  });
+const STATS = [
+  { value: "1,500+", label: "Schemes Indexed" },
+  { value: "200+", label: "Automated Tests" },
+  { value: "5", label: "AI Intelligence Layers" },
+  { value: "<2s", label: "Avg Response Time" },
+];
 
-  // Text to speech
-  const { speak, stop: stopSpeaking, isSpeaking } = useTextToSpeech({ language });
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isProcessing]);
-
-  // Auto-read AI responses when voice mode is active
-  useEffect(() => {
-    if (!voiceModeActive) return;
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === "assistant" && !isProcessing) {
-      playSound("responseReceived");
-      speak(cleanTextForTTS(lastMsg.content));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages.length, isProcessing]);
-
-  // Focus input after response
-  useEffect(() => {
-    if (!isProcessing && messages.length > 0) {
-      inputRef.current?.focus();
-    }
-  }, [isProcessing, messages.length]);
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyboard = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === "V") {
-        e.preventDefault();
-        if (isListening) {
-          stopListening();
-        } else if (voiceSupported) {
-          setVoiceModeActive(true);
-          startListening();
-          playSound("startListening");
-        }
-        return;
-      }
-      if (e.key === "Escape") {
-        if (isListening) { stopListening(); playSound("stopListening"); }
-        if (isSpeaking) { stopSpeaking(); }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyboard);
-    return () => window.removeEventListener("keydown", handleKeyboard);
-  }, [isListening, isSpeaking, voiceSupported, startListening, stopListening, stopSpeaking, playSound]);
-
-  // Send message handler
-  async function handleSendMessage(text: string) {
-    if (!text.trim()) return;
-
-    const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content: text.trim(),
-      timestamp: new Date(),
-      mode: activeMode,
-    };
-
-    addMessage(userMessage);
-    setTextInput("");
-    setIsProcessing(true);
-    playSound("messageSent");
-
-    try {
-      const response = await sendChatMessage(text, activeMode, messages, language, conversationId ?? undefined);
-
-      // Track conversation thread
-      if (response.conversationId) {
-        setConversationId(response.conversationId);
-      }
-
-      if (response.mode !== activeMode) {
-        setActiveMode(response.mode);
-        playSound("modeSwitch");
-      }
-
-      const assistantMessage: ChatMessage = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: response.content,
-        timestamp: new Date(),
-        mode: response.mode,
-        conversationId: response.conversationId,
-      };
-
-      addMessage(assistantMessage);
-    } catch {
-      playSound("error");
-      const errorMessage: ChatMessage = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content:
-          language === "hi"
-            ? "Maaf kijiye, kuch gadbad ho gayi. Kripya dobara koshish karein."
-            : "Sorry, something went wrong. Please try again.",
-        timestamp: new Date(),
-        mode: activeMode,
-      };
-      addMessage(errorMessage);
-    } finally {
-      setIsProcessing(false);
-    }
-  }
-
-  const handleTextSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSendMessage(textInput);
-  };
-
-  const handleVoiceToggle = () => {
-    if (isListening) {
-      stopListening();
-      playSound("stopListening");
-    } else {
-      setVoiceModeActive(true);
-      startListening();
-      playSound("startListening");
-    }
-  };
-
-  const hasMessages = messages.length > 0;
-
+// ── Component ───────────────────────────────────────────────
+export default function LandingPage() {
   return (
-    <div
-      className="flex flex-col min-h-dvh"
-      style={{
-        background: activeModeConfig
-          ? `radial-gradient(ellipse at top, ${activeModeConfig.surfaceColor}, var(--bg-primary) 70%)`
-          : "var(--bg-primary)",
-        transition: "background 0.5s ease",
-      }}
-    >
-      {/* Skip to content — accessibility */}
-      <a href="#chat-content" className="skip-to-content">
-        {language === "hi" ? "मुख्य सामग्री पर जाएं" : "Skip to content"}
-      </a>
+    <div className="landing" style={{ position: "relative" }}>
+      {/* ─── 3D Background Layer (behind everything) ────────── */}
+      <LandingBackground />
 
-      {/* ── Glassmorphic Header ─────────────────────── */}
-      <header className="app-header" role="banner">
-        <div style={{ maxWidth: "80rem", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{
-              background: `${activeModeConfig?.primaryColor || "#2563EB"}20`,
-              padding: "8px",
-              borderRadius: "var(--radius-sm)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <span className="material-symbols-outlined" style={{ color: activeModeConfig?.primaryColor || "#2563EB", fontSize: "24px" }}>
+      {/* ─── All content above the background ──────────────── */}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {/* ─── Navbar ────────────────────────────────────────── */}
+        <nav className="landing-nav">
+          <div className="landing-nav-inner">
+            <Link href="/" className="landing-logo">
+              <span className="material-symbols-outlined" style={{ color: "#2563EB", fontSize: 24 }}>
                 auto_awesome
               </span>
-            </div>
-            <h1 className="font-display" style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-              {APP_NAME}
-            </h1>
-          </div>
-
-          <div className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            {/* Hamburger button — mobile only */}
-            <button
-              className="nav-hamburger"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label={language === "hi" ? "मेनू खोलें" : "Open menu"}
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu"
-              style={{
-                padding: "8px",
-                borderRadius: "var(--radius-sm)",
-                border: "none",
-                background: "var(--bg-surface)",
-                color: "var(--text-secondary)",
-                cursor: "pointer",
-                display: "none",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: "24px" }}>menu</span>
-            </button>
-            {/* Mode badge pill */}
-            {activeModeConfig && (
-              <div className="mode-badge" style={{
-                background: `${activeModeConfig.primaryColor}20`,
-                border: `1px solid ${activeModeConfig.primaryColor}30`,
-                color: activeModeConfig.primaryColor,
-                display: hasMessages ? "inline-flex" : "none",
-              }}>
-                <span style={{ fontSize: "14px" }}>{activeModeConfig.icon}</span>
-                <span>{language === "hi" ? activeModeConfig.nameHi : activeModeConfig.name}</span>
-              </div>
-            )}
-            <button
-              className="glass-card"
-              style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "none" }}
-              title="Home"
-              aria-label="Go to home page"
-              onClick={() => {
-                clearMessages();
-                setActiveMode(null);
-                window.scrollTo(0, 0);
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
-                home
-              </span>
-            </button>
-            <Link
-              href="/dashboard"
-              className="glass-card"
-              style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
-              title="CommPulse Dashboard"
-              aria-label="Open analytics dashboard"
-            >
-              <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
-                dashboard
+              <span className="font-display" style={{ fontWeight: 600, fontSize: 18, color: "var(--text-primary)" }}>
+                JanSathi AI
               </span>
             </Link>
-            {isAuthenticated && (
-              <Link
-                href="/history"
-                className="glass-card"
-                style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                title={language === "hi" ? "इतिहास" : "History"}
-                aria-label="Conversation history"
-              >
-                <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
-                  history
-                </span>
+            <div className="landing-nav-links">
+              <Link href="/chat" className="landing-nav-cta">
+                Start Chatting
               </Link>
-            )}
-            {isAuthenticated ? (
-              <>
-                <Link
-                  href="/profile"
-                  className="glass-card"
-                  style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                  title={language === "hi" ? "प्रोफ़ाइल" : "Profile"}
-                  aria-label="View profile"
-                >
-                  <span className="material-symbols-outlined" style={{ color: "#10B981", fontSize: "20px" }}>
-                    person
-                  </span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="glass-card"
-                  style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "none" }}
-                  title={language === "hi" ? "लॉग आउट" : "Logout"}
-                  aria-label="Logout"
-                >
-                  <span className="material-symbols-outlined" style={{ color: "var(--text-muted)", fontSize: "20px" }}>
-                    logout
-                  </span>
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="glass-card"
-                style={{ padding: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                title={language === "hi" ? "लॉग इन" : "Login"}
-                aria-label="Login"
-              >
-                <span className="material-symbols-outlined" style={{ color: "var(--text-secondary)", fontSize: "20px" }}>
-                  login
-                </span>
-              </Link>
-            )}
-            <LanguageSwitcher />
+            </div>
           </div>
-        </div>
-      </header>
+        </nav>
 
-      {/* Mobile menu */}
-      <MobileMenu
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        language={language}
-        isAuthenticated={isAuthenticated}
-        onLogout={handleLogout}
-        onHomeClick={() => {
-          clearMessages();
-          setActiveMode(null);
-          window.scrollTo(0, 0);
-        }}
-      />
-
-      {/* ── Main Content ───────────────────────── */}
-      <main id="chat-content" className="flex flex-col flex-1 overflow-y-auto" role="main">
-        {!hasMessages ? (
-          /* ── Welcome View (Stitch Bento Layout) ──── */
+        {/* ─── 1. Hero ───────────────────────────────────────── */}
+        <section className="landing-hero">
           <motion.div
-            className="flex flex-col items-center flex-1 px-4 py-8"
-            style={{ maxWidth: "80rem", margin: "0 auto", width: "100%" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            className="landing-hero-content"
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
           >
-            {/* Hero Section */}
-            <section style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "40px 0 32px" }}>
-              {/* Glowing Voice Button */}
-              <div style={{ position: "relative" }}>
-                <div className="voice-glow" />
-                {voiceSupported && (
-                  <VoiceButton
-                    isListening={isListening}
-                    isProcessing={isProcessing}
-                    onToggle={handleVoiceToggle}
-                    accentColor={activeModeConfig?.primaryColor}
-                    language={language}
-                    interimTranscript={interimTranscript}
-                  />
-                )}
-              </div>
+            <motion.div className="landing-hero-badge" custom={0} variants={fadeUp}>
+              <span className="material-symbols-outlined" style={{ fontSize: 14, color: "#10B981" }}>check_circle</span>
+              <span>Powered by Retrieval-Augmented Generation</span>
+            </motion.div>
 
-              <h2 className="font-display" style={{
-                fontSize: "clamp(1.75rem, 3vw, 2.5rem)",
-                fontWeight: 700,
-                marginTop: "28px",
-                letterSpacing: "-0.02em",
-              }}>
-                {language === "hi" ? "🙏 नमस्ते! बोलिए या टैप करें" : "🙏 Namaste! Tap to speak"}
-              </h2>
-              <p style={{ color: "var(--text-secondary)", marginTop: "8px", fontSize: "1.125rem", maxWidth: "32rem" }}>
-                {language === "hi" ? APP_TAGLINE_HI : APP_TAGLINE}
-              </p>
-            </section>
+            <motion.h1 className="landing-hero-title font-display" custom={1} variants={fadeUp}>
+              Your AI-Powered Gateway to{" "}
+              <span className="landing-hero-gradient">Government Services</span>
+            </motion.h1>
 
-            {/* Mode Selection — Bento Grid */}
-            <div style={{ width: "100%", maxWidth: "56rem", marginBottom: "24px" }}>
-              <p style={{ color: "var(--text-muted)", textAlign: "center", fontSize: "0.875rem", marginBottom: "16px" }}>
-                {language === "hi" ? "या कोई विषय चुनें:" : "Or choose a topic:"}
-              </p>
-              <ModeSelector />
-            </div>
+            <motion.p className="landing-hero-subtitle" custom={2} variants={fadeUp}>
+              Intelligent scheme matching powered by semantic retrieval,
+              conversation memory, and verified knowledge — designed for every citizen of India.
+            </motion.p>
 
-            {/* Quick Actions (if mode selected) */}
-            <AnimatePresence>
-              {activeMode && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  style={{ width: "100%", maxWidth: "56rem" }}
-                >
-                  <QuickActions
-                    mode={activeMode}
-                    onActionSelect={handleSendMessage}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <motion.div className="landing-hero-actions" custom={3} variants={fadeUp}>
+              <Link href="/chat" className="landing-btn landing-btn-primary">
+                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>chat</span>
+                Start a Conversation
+              </Link>
+              <a href="#how-it-works" className="landing-btn landing-btn-secondary">
+                Learn How It Works
+              </a>
+            </motion.div>
 
-            {/* Module-specific widgets */}
-            <div style={{ width: "100%", maxWidth: "56rem" }}>
-              <ModulePanel
-                mode={activeMode}
-                onAskQuestion={handleSendMessage}
-                language={language}
-              />
-            </div>
+            <motion.div className="landing-hero-stats" custom={4} variants={fadeUp}>
+              {STATS.map((s) => (
+                <div key={s.label} className="landing-stat">
+                  <span className="landing-stat-value font-display">{s.value}</span>
+                  <span className="landing-stat-label">{s.label}</span>
+                </div>
+              ))}
+            </motion.div>
           </motion.div>
-        ) : (
-          /* ── Chat View ─────────────────────── */
-          <>
-            {/* Mode indicator bar */}
-            {activeModeConfig && (
-              <div
-                className="mode-badge"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "8px 16px",
-                  borderRadius: 0,
-                  width: "100%",
-                  background: activeModeConfig.surfaceColor,
-                  color: activeModeConfig.primaryColor,
-                  borderBottom: `2px solid ${activeModeConfig.primaryColor}30`,
-                }}
-                role="status"
-                aria-label={`Active module: ${activeModeConfig.name}`}
-              >
-                <span aria-hidden="true" style={{ fontSize: "16px" }}>{activeModeConfig.icon}</span>
-                <span style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.75rem" }}>
-                  {language === "hi" ? activeModeConfig.nameHi : activeModeConfig.name}
-                  {" "}Mode
-                </span>
-                {voiceModeActive && (
-                  <span style={{
-                    fontSize: "0.7rem",
-                    marginLeft: "4px",
-                    padding: "2px 8px",
-                    borderRadius: "var(--radius-full)",
-                    background: "var(--bg-elevated)",
-                    color: "var(--text-muted)",
-                  }}>
-                    🔊 {language === "hi" ? "ऑटो-रीड" : "Auto-read"}
-                  </span>
-                )}
-                <span
-                  style={{ marginLeft: "auto", cursor: "pointer", color: "var(--text-muted)", fontSize: "0.875rem" }}
-                  onClick={() => setActiveMode(null)}
-                  role="button"
-                  aria-label={language === "hi" ? "मॉड्यूल बंद करें" : "Close module"}
-                  tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === "Enter") setActiveMode(null); }}
-                >
-                  ✕
-                </span>
-              </div>
-            )}
 
-            {/* Chat messages */}
-            <div className="chat-container flex-1"
-              role="log"
-              aria-live="polite"
-              aria-label={language === "hi" ? "चैट संदेश" : "Chat messages"}>
-              {messages.map((msg, i) => (
-                <div key={msg.id}>
-                  <ChatBubble
-                    message={msg}
-                    onSpeak={msg.role === "assistant" ? speak : undefined}
-                    isSpeaking={isSpeaking}
-                    onStopSpeaking={stopSpeaking}
-                    language={language}
-                  />
-                  {msg.role === "assistant" && msg.conversationId && i === messages.length - 1 && (
-                    <div style={{ paddingLeft: "12px", marginBottom: "4px" }}>
-                      <FeedbackBar conversationId={msg.conversationId} />
+          {/* Gradient orb background */}
+          <div className="landing-hero-orb landing-hero-orb-1" />
+          <div className="landing-hero-orb landing-hero-orb-2" />
+        </section>
+
+        {/* ─── 2. Problem Statement ──────────────────────────── */}
+        <section className="landing-section">
+          <motion.div
+            className="landing-container"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+          >
+            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+              <span className="landing-section-tag">The Problem</span>
+              <h2 className="landing-section-title font-display">
+                1,500+ Government Schemes.<br />
+                <span style={{ color: "var(--text-muted)" }}>Most Citizens Can't Find the Right One.</span>
+              </h2>
+              <p className="landing-section-desc">
+                Language barriers, complex eligibility criteria, scattered information, and lack of personalization
+                leave millions without access to the services designed for them.
+              </p>
+            </motion.div>
+
+            <motion.div className="landing-problem-grid" custom={1} variants={fadeUp}>
+              {[
+                { value: "70%", label: "of eligible citizens unaware of applicable schemes", icon: "visibility_off" },
+                { value: "22+", label: "official languages — most portals only support Hindi/English", icon: "translate" },
+                { value: "45min", label: "average time to navigate a government portal", icon: "schedule" },
+              ].map((item) => (
+                <div key={item.label} className="landing-problem-card">
+                  <span className="material-symbols-outlined" style={{ fontSize: 28, color: "var(--error)", marginBottom: 12 }}>
+                    {item.icon}
+                  </span>
+                  <span className="landing-problem-value font-display">{item.value}</span>
+                  <span className="landing-problem-label">{item.label}</span>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ─── 3. How It Works (Pipeline) ────────────────────── */}
+        <section id="how-it-works" className="landing-section landing-section-alt">
+          <motion.div
+            className="landing-container"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+          >
+            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+              <span className="landing-section-tag">How It Works</span>
+              <h2 className="landing-section-title font-display">
+                From Question to Verified Answer —{" "}
+                <span style={{ color: "var(--janseva-primary)" }}>In Seconds</span>
+              </h2>
+            </motion.div>
+
+            <motion.div className="landing-pipeline" custom={1} variants={fadeUp}>
+              {PIPELINE_STEPS.map((step, i) => (
+                <div key={step.label} className="landing-pipeline-step">
+                  <div className="landing-pipeline-icon" style={{ borderColor: step.color }}>
+                    <span className="material-symbols-outlined" style={{ color: step.color, fontSize: 24 }}>
+                      {step.icon}
+                    </span>
+                  </div>
+                  <div className="landing-pipeline-text">
+                    <span className="landing-pipeline-title font-display">{step.label}</span>
+                    <span className="landing-pipeline-desc">{step.desc}</span>
+                  </div>
+                  {i < PIPELINE_STEPS.length - 1 && (
+                    <div className="landing-pipeline-arrow">
+                      <span className="material-symbols-outlined" style={{ color: "var(--text-muted)", fontSize: 20 }}>
+                        arrow_forward
+                      </span>
                     </div>
                   )}
                 </div>
               ))}
+            </motion.div>
+          </motion.div>
+        </section>
 
-              {isProcessing && <LoadingDots />}
-
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Quick actions for current mode */}
-            {activeMode && (
-              <QuickActions
-                mode={activeMode}
-                onActionSelect={handleSendMessage}
-              />
-            )}
-
-            {/* Module-specific widgets */}
-            <ModulePanel
-              mode={activeMode}
-              onAskQuestion={handleSendMessage}
-              language={language}
-            />
-          </>
-        )}
-      </main>
-
-      {/* ── Sticky Bottom Input Bar (Stitch V2) ──── */}
-      <div className="input-bar" role="toolbar" aria-label={language === "hi" ? "संदेश भेजें" : "Send message"}>
-        <div className="input-bar-inner">
-          {/* Mic button */}
-          <button
-            className="mic-btn"
-            onClick={handleVoiceToggle}
-            disabled={!voiceSupported || isProcessing}
-            style={{
-              background: activeModeConfig?.primaryColor || "var(--info)",
-              boxShadow: `0 0 20px ${activeModeConfig?.primaryColor || "rgba(59,130,246,0.4)"}40`,
-              position: "relative",
-            }}
-            aria-label={isListening
-              ? (language === "hi" ? "सुनना बंद करें" : "Stop voice input")
-              : (language === "hi" ? "आवाज़ से बोलें" : "Voice input")
-            }
-            aria-pressed={isListening}
-            title="Ctrl+Shift+V"
+        {/* ─── 4. Intelligence Stack ─────────────────────────── */}
+        <section className="landing-section">
+          <motion.div
+            className="landing-container"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
           >
-            {isListening ? (
-              <>
-                <div className="voice-waveform" style={{ color: "white" }}>
-                  <span className="bar" /><span className="bar" /><span className="bar" />
-                </div>
-                <span style={{
-                  position: "absolute",
-                  inset: 0,
-                  borderRadius: "var(--radius-full)",
-                  background: activeModeConfig?.primaryColor || "var(--info)",
-                  opacity: 0.2,
-                  animation: "voice-pulse 1.5s ease-in-out infinite",
-                }} />
-              </>
-            ) : (
-              <span className="material-symbols-outlined" style={{ fontSize: "24px" }}>mic</span>
-            )}
-          </button>
+            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+              <span className="landing-section-tag">Intelligence Architecture</span>
+              <h2 className="landing-section-title font-display">
+                Four Layers of Context.
+                <br />
+                <span style={{ color: "var(--intel-memory)" }}>One Intelligent Response.</span>
+              </h2>
+              <p className="landing-section-desc">
+                Every response is grounded in verified documents, enriched with your conversation history,
+                informed by your long-term profile, and ranked for maximum relevance.
+              </p>
+            </motion.div>
 
-          {/* Show interim transcript while listening */}
-          {isListening && interimTranscript ? (
-            <div className="flex-1 interim-transcript px-3">
-              &ldquo;{interimTranscript}&rdquo;
+            <motion.div className="landing-intel-grid" custom={1} variants={fadeUp}>
+              {INTEL_CARDS.map((card, i) => (
+                <motion.div key={card.title} className="landing-intel-card" custom={i + 2} variants={fadeUp}>
+                  <div className="landing-intel-icon" style={{ background: `${card.color}18` }}>
+                    <span className="material-symbols-outlined" style={{ color: card.color, fontSize: 24 }}>
+                      {card.icon}
+                    </span>
+                  </div>
+                  <h3 className="landing-intel-title font-display">{card.title}</h3>
+                  <p className="landing-intel-desc">{card.desc}</p>
+                  <div className="landing-intel-line" style={{ background: card.color }} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ─── 5. Features Grid ──────────────────────────────── */}
+        <section className="landing-section landing-section-alt">
+          <motion.div
+            className="landing-container"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+          >
+            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+              <span className="landing-section-tag">Capabilities</span>
+              <h2 className="landing-section-title font-display">
+                Production-Grade.{" "}
+                <span style={{ color: "var(--success)" }}>Not a Prototype.</span>
+              </h2>
+            </motion.div>
+
+            <motion.div className="landing-features-grid" custom={1} variants={fadeUp}>
+              {FEATURES.map((f, i) => (
+                <motion.div key={f.title} className="landing-feature-card" custom={i + 2} variants={fadeUp}>
+                  <span className="material-symbols-outlined landing-feature-icon">
+                    {f.icon}
+                  </span>
+                  <h3 className="landing-feature-title">{f.title}</h3>
+                  <p className="landing-feature-desc">{f.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ─── 6. Trust & Security ───────────────────────────── */}
+        <section className="landing-section">
+          <motion.div
+            className="landing-container"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+          >
+            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+              <span className="landing-section-tag">Security</span>
+              <h2 className="landing-section-title font-display">
+                Your Data. Your Privacy.{" "}
+                <span style={{ color: "var(--janseva-primary)" }}>No Compromise.</span>
+              </h2>
+            </motion.div>
+
+            <motion.div className="landing-trust-grid" custom={1} variants={fadeUp}>
+              {[
+                { icon: "shield", title: "User-Isolated Memory", desc: "Every user's conversation memory and profile is completely isolated. No cross-user data leakage — ever." },
+                { icon: "lock", title: "OTP-Only Authentication", desc: "No passwords to steal. Phone-based OTP with rate limiting, brute-force protection, and session cookies." },
+                { icon: "key", title: "No Secrets in Code", desc: "All credentials are environment-injected at runtime. Git history cleaned. Gitleaks CI scanning active." },
+                { icon: "speed", title: "Rate-Limited by Design", desc: "Redis-backed rate limiting with per-user quotas. Automatic scaling. Memory fallback for zero-downtime." },
+              ].map((item, i) => (
+                <motion.div key={item.title} className="landing-trust-card" custom={i + 2} variants={fadeUp}>
+                  <span className="material-symbols-outlined" style={{ color: "var(--janseva-primary)", fontSize: 24 }}>
+                    {item.icon}
+                  </span>
+                  <h3 className="landing-trust-title font-display">{item.title}</h3>
+                  <p className="landing-trust-desc">{item.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ─── 7. CTA Footer ─────────────────────────────────── */}
+        <section className="landing-cta">
+          <motion.div
+            className="landing-container"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={stagger}
+          >
+            <motion.h2 className="landing-cta-title font-display" custom={0} variants={fadeUp}>
+              Ready to access the schemes you deserve?
+            </motion.h2>
+            <motion.p className="landing-cta-desc" custom={1} variants={fadeUp}>
+              Start a conversation in Hindi or English. No account required.
+            </motion.p>
+            <motion.div className="landing-cta-actions" custom={2} variants={fadeUp}>
+              <Link href="/chat" className="landing-btn landing-btn-primary landing-btn-lg">
+                <span className="material-symbols-outlined" style={{ fontSize: 22 }}>chat</span>
+                Start a Conversation
+              </Link>
+              <Link href="/login" className="landing-btn landing-btn-ghost">
+                Sign in with OTP
+              </Link>
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ─── Footer ────────────────────────────────────────── */}
+        <footer className="landing-footer">
+          <div className="landing-container">
+            <div className="landing-footer-inner">
+              <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                © 2026 JanSathi AI · Built with ❤️ for Bharat
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                201 automated tests · Production-grade architecture
+              </span>
             </div>
-          ) : (
-            <form onSubmit={handleTextSubmit} style={{ display: "flex", flex: 1, gap: "12px" }}>
-              <input
-                ref={inputRef}
-                type="text"
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                placeholder={
-                  language === "hi"
-                    ? "अपना सवाल लिखें..."
-                    : "Type your question..."
-                }
-                disabled={isProcessing}
-                aria-label={language === "hi" ? "अपना सवाल लिखें" : "Type your question"}
-              />
-
-              <button
-                type="submit"
-                className="send-btn"
-                disabled={!textInput.trim() || isProcessing}
-                style={{
-                  background: activeModeConfig?.primaryColor || "var(--info)",
-                  boxShadow: `0 0 15px ${activeModeConfig?.primaryColor || "rgba(59,130,246,0.3)"}40`,
-                  opacity: !textInput.trim() || isProcessing ? 0.5 : 1,
-                }}
-                aria-label={language === "hi" ? "भेजें" : "Send message"}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: "20px", transform: "rotate(-45deg) translate(1px, -1px)" }}>send</span>
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-
-      {/* Keyboard shortcut hint (sr-only) */}
-      <div className="sr-only" aria-live="assertive">
-        {isListening && (language === "hi" ? "सुन रहा है। Escape दबाकर रोकें।" : "Listening. Press Escape to stop.")}
+          </div>
+        </footer>
       </div>
     </div>
   );

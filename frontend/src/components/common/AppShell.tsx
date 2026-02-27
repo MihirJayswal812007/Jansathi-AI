@@ -23,8 +23,11 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
     { href: "/chat", label: "Chat", labelHi: "चैट", icon: "chat", auth: "any" },
     { href: "/history", label: "History", labelHi: "इतिहास", icon: "history", auth: "auth" },
-    { href: "/dashboard", label: "Dashboard", labelHi: "डैशबोर्ड", icon: "dashboard", auth: "admin" },
     { href: "/profile", label: "Profile", labelHi: "प्रोफ़ाइल", icon: "person", auth: "auth" },
+    { href: "/settings", label: "Settings", labelHi: "सेटिंग्स", icon: "settings", auth: "auth" },
+    // ── Admin-only routes ──────────────────────────────────
+    { href: "/admin/dashboard", label: "Admin Dashboard", labelHi: "एडमिन डैशबोर्ड", icon: "dashboard", auth: "admin" },
+    { href: "/admin/analytics", label: "Analytics", labelHi: "विश्लेषण", icon: "analytics", auth: "admin" },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -68,6 +71,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     });
 
     const isActive = (href: string) => {
+        if (href === "/chat") return pathname === href || pathname === "/";
         return pathname === href || pathname.startsWith(href + "/");
     };
 
