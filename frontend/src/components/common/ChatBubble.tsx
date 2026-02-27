@@ -111,6 +111,22 @@ export default function ChatBubble({
                             {timeStr}
                         </time>
                     )}
+                    {/* RAG indicator badge */}
+                    <span
+                        style={{
+                            marginLeft: "auto",
+                            fontSize: "0.65rem",
+                            fontWeight: 600,
+                            padding: "2px 8px",
+                            borderRadius: "var(--radius-full)",
+                            background: "#10B98115",
+                            color: "#10B981",
+                            border: "1px solid #10B98130",
+                            letterSpacing: "0.02em",
+                        }}
+                    >
+                        ✦ Grounded
+                    </span>
                 </div>
             )}
 

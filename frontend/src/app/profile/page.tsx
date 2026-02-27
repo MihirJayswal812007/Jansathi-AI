@@ -18,11 +18,9 @@ import {
     Briefcase,
 } from "lucide-react";
 import AuthGuard from "@/components/common/AuthGuard";
-import {
-    fetchProfile,
-    updateProfile,
-    type UserProfile,
-} from "@/lib/apiClient";
+import { ErrorFallback } from "@/components/common/ErrorFallback";
+import { useProfile } from "@/hooks/useProfile";
+import type { UserProfile } from "@/lib/apiClient";
 
 type EditableField = keyof Pick<
     UserProfile,
@@ -144,61 +142,39 @@ function SectionCard({
 
 export default function ProfilePage() {
     const router = useRouter();
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const { profile, isLoading: loading, error, isSaving: saving, saveSuccess: saved, updateProfileField, refetch } = useProfile();
     const [draft, setDraft] = useState<Record<string, string>>({});
     const [editing, setEditing] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [saved, setSaved] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
+    // Sync draft when profile loads
     useEffect(() => {
-        (async () => {
-            try {
-                const data = await fetchProfile();
-                setProfile(data);
-                setDraft(
-                    Object.fromEntries(
-                        FIELD_CONFIG.map((f) => [f.key, String(data[f.key] ?? "")])
-                    )
-                );
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to load profile");
-            } finally {
-                setLoading(false);
-            }
-        })();
-    }, []);
+        if (profile) {
+            setDraft(
+                Object.fromEntries(
+                    FIELD_CONFIG.map((f) => [f.key, String(profile[f.key] ?? "")])
+                )
+            );
+        }
+    }, [profile]);
 
     const handleSave = async () => {
-        setSaving(true);
-        setError(null);
-        try {
-            // Build only changed fields
-            const changes: Record<string, unknown> = {};
-            for (const field of FIELD_CONFIG) {
-                const newVal = draft[field.key];
-                const oldVal = String(profile?.[field.key] ?? "");
-                if (newVal !== oldVal && newVal !== "") {
-                    changes[field.key] = field.type === "number" ? Number(newVal) : newVal;
-                }
+        // Build only changed fields
+        const changes: Record<string, unknown> = {};
+        for (const field of FIELD_CONFIG) {
+            const newVal = draft[field.key];
+            const oldVal = String(profile?.[field.key] ?? "");
+            if (newVal !== oldVal && newVal !== "") {
+                changes[field.key] = field.type === "number" ? Number(newVal) : newVal;
             }
-
-            if (Object.keys(changes).length === 0) {
-                setEditing(false);
-                return;
-            }
-
-            const updated = await updateProfile(changes);
-            setProfile(updated);
-            setEditing(false);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Save failed");
-        } finally {
-            setSaving(false);
         }
+
+        if (Object.keys(changes).length === 0) {
+            setEditing(false);
+            return;
+        }
+
+        await updateProfileField(changes);
+        setEditing(false);
     };
 
     const sections = [
@@ -315,12 +291,7 @@ export default function ProfilePage() {
 
                     {/* Error */}
                     {error && (
-                        <div
-                            className="p-3 rounded-xl mb-4 text-sm"
-                            style={{ background: "#EF444420", color: "#EF4444", border: "1px solid #EF444440" }}
-                        >
-                            {error}
-                        </div>
+                        <ErrorFallback error={error} onRetry={refetch} />
                     )}
 
                     {/* Loading */}

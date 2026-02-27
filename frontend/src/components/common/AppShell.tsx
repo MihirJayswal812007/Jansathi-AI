@@ -5,7 +5,8 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useModeStore } from "@/store/modeStore";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -20,7 +21,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-    { href: "/", label: "Chat", labelHi: "चैट", icon: "chat", auth: "any" },
+    { href: "/chat", label: "Chat", labelHi: "चैट", icon: "chat", auth: "any" },
     { href: "/history", label: "History", labelHi: "इतिहास", icon: "history", auth: "auth" },
     { href: "/dashboard", label: "Dashboard", labelHi: "डैशबोर्ड", icon: "dashboard", auth: "admin" },
     { href: "/profile", label: "Profile", labelHi: "प्रोफ़ाइल", icon: "person", auth: "auth" },
@@ -38,13 +39,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         if (saved === "true") setCollapsed(true);
     }, []);
 
-    const toggleCollapsed = () => {
+    const toggleCollapsed = useCallback(() => {
         setCollapsed((prev) => {
             const next = !prev;
             localStorage.setItem("sidebar-collapsed", String(next));
             return next;
         });
-    };
+    }, []);
+
+    // Keyboard shortcut: Ctrl+B to toggle sidebar
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "b") {
+                e.preventDefault();
+                toggleCollapsed();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [toggleCollapsed]);
 
     // Filter nav items based on auth state
     const visibleItems = NAV_ITEMS.filter((item) => {
@@ -55,8 +68,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     });
 
     const isActive = (href: string) => {
-        if (href === "/") return pathname === "/";
-        return pathname.startsWith(href);
+        return pathname === href || pathname.startsWith(href + "/");
     };
 
     return (
@@ -82,8 +94,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     <button
                         className="sidebar-collapse-btn"
                         onClick={toggleCollapsed}
-                        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        title={collapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
                         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        aria-expanded={!collapsed}
                     >
                         <span className="material-symbols-outlined">
                             {collapsed ? "chevron_right" : "chevron_left"}
@@ -159,7 +172,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
             {/* Main content area — shifts with sidebar */}
             <div className={`app-main${collapsed ? " app-main--sidebar-collapsed" : ""}`}>
-                {children}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={pathname}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                    >
+                        {children}
+                    </motion.div>
+                </AnimatePresence>
             </div>
         </div>
     );

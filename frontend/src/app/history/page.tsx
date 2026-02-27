@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,8 +16,10 @@ import {
     ThumbsDown,
 } from "lucide-react";
 import AuthGuard from "@/components/common/AuthGuard";
+import { ErrorFallback } from "@/components/common/ErrorFallback";
+import { EmptyState } from "@/components/common/EmptyState";
+import { useConversations } from "@/hooks/useConversations";
 import {
-    fetchConversations,
     fetchConversationDetail,
     type ConversationSummary,
     type ConversationDetail,
@@ -145,29 +147,10 @@ function ConversationCard({
 
 export default function HistoryPage() {
     const router = useRouter();
-    const [conversations, setConversations] = useState<ConversationSummary[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { conversations, page, totalPages, isLoading: loading, error, setPage, refetch } = useConversations();
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [details, setDetails] = useState<Record<string, ConversationDetail>>({});
     const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-
-    useEffect(() => {
-        (async () => {
-            setLoading(true);
-            try {
-                const result = await fetchConversations(page);
-                setConversations(result.data);
-                setTotalPages(result.pagination.totalPages);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to load conversations");
-            } finally {
-                setLoading(false);
-            }
-        })();
-    }, [page]);
 
     const handleToggle = async (id: string) => {
         if (expandedId === id) {
@@ -213,12 +196,7 @@ export default function HistoryPage() {
 
                     {/* Error */}
                     {error && (
-                        <div
-                            className="p-3 rounded-xl mb-4 text-sm"
-                            style={{ background: "#EF444420", color: "#EF4444", border: "1px solid #EF444440" }}
-                        >
-                            {error}
-                        </div>
+                        <ErrorFallback error={error} onRetry={refetch} />
                     )}
 
                     {/* Loading */}
@@ -227,12 +205,13 @@ export default function HistoryPage() {
                             <Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} />
                         </div>
                     ) : conversations.length === 0 ? (
-                        <div className="text-center py-16">
-                            <MessageSquare size={40} style={{ color: "var(--text-muted)", margin: "0 auto 12px" }} />
-                            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                                No conversations yet. Start chatting!
-                            </p>
-                        </div>
+                        <EmptyState
+                            icon={<MessageSquare size={28} />}
+                            title="No conversations yet"
+                            description="Start chatting to see your conversation history here."
+                            ctaLabel="Start Chatting"
+                            ctaHref="/chat"
+                        />
                     ) : (
                         <>
                             <div className="flex flex-col gap-3">
@@ -252,7 +231,7 @@ export default function HistoryPage() {
                             {totalPages > 1 && (
                                 <div className="flex items-center justify-center gap-4 mt-6">
                                     <button
-                                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                        onClick={() => setPage(Math.max(1, page - 1))}
                                         disabled={page === 1}
                                         className="px-3 py-1.5 rounded-lg text-xs"
                                         style={{
@@ -267,7 +246,7 @@ export default function HistoryPage() {
                                         {page} / {totalPages}
                                     </span>
                                     <button
-                                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                        onClick={() => setPage(Math.min(totalPages, page + 1))}
                                         disabled={page === totalPages}
                                         className="px-3 py-1.5 rounded-lg text-xs"
                                         style={{

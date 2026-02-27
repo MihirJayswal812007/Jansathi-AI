@@ -135,9 +135,36 @@ export default function LoginPage() {
 
     return (
         <div
-            className="min-h-dvh flex items-center justify-center px-4"
+            className="min-h-dvh flex items-center justify-center px-4 relative overflow-hidden"
             style={{ background: "var(--bg-primary)" }}
         >
+            {/* Ambient glow orbs */}
+            <div
+                style={{
+                    position: "absolute",
+                    top: "20%",
+                    left: "30%",
+                    width: "400px",
+                    height: "400px",
+                    borderRadius: "50%",
+                    background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
+                    filter: "blur(60px)",
+                    pointerEvents: "none",
+                }}
+            />
+            <div
+                style={{
+                    position: "absolute",
+                    bottom: "15%",
+                    right: "25%",
+                    width: "350px",
+                    height: "350px",
+                    borderRadius: "50%",
+                    background: "radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%)",
+                    filter: "blur(50px)",
+                    pointerEvents: "none",
+                }}
+            />
             <motion.div
                 className="w-full max-w-sm"
                 initial={{ opacity: 0, y: 20 }}
@@ -165,12 +192,15 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                {/* Card */}
+                {/* Card with enhanced glassmorphism */}
                 <div
                     className="p-6 rounded-2xl"
                     style={{
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-primary)",
+                        background: "rgba(255, 255, 255, 0.03)",
+                        backdropFilter: "blur(20px)",
+                        WebkitBackdropFilter: "blur(20px)",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
                     }}
                 >
                     <AnimatePresence mode="wait">
@@ -370,6 +400,20 @@ export default function LoginPage() {
                 >
                     Skip login — continue as guest →
                 </button>
+
+                {/* Trust features */}
+                <div className="flex items-center justify-center gap-6 mt-6">
+                    {[
+                        { icon: "🌐", label: "22+ Languages" },
+                        { icon: "🔒", label: "Secure Access" },
+                        { icon: "🏛️", label: "Govt. Schemes" },
+                    ].map((f) => (
+                        <div key={f.label} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
+                            <span>{f.icon}</span>
+                            <span>{f.label}</span>
+                        </div>
+                    ))}
+                </div>
             </motion.div>
         </div>
     );
