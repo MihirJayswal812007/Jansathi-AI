@@ -1,6 +1,8 @@
 // ===== JanSathi AI — Not Found Page =====
 // Custom 404 page. Uses glassmorphism design system.
 
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 
 export default function NotFound() {

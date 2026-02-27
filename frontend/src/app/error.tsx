@@ -3,6 +3,9 @@
 
 "use client";
 
+// Prevent SSR prerender — error boundary uses client hooks
+export const dynamic = "force-dynamic";
+
 import { useEffect } from "react";
 
 export default function Error({
@@ -12,8 +15,11 @@ export default function Error({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    // Guard against null props during prerender
+    const digest = error?.digest;
+
     useEffect(() => {
-        console.error("[JanSathi Error Boundary]", error);
+        if (error) console.error("[JanSathi Error Boundary]", error);
     }, [error]);
 
     return (
@@ -46,9 +52,9 @@ export default function Error({
                 <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: "24px", lineHeight: 1.5 }}>
                     An unexpected error occurred. You can try again or go back to the home page.
                 </p>
-                {error.digest && (
+                {digest && (
                     <p style={{ color: "var(--text-muted)", fontSize: "0.7rem", marginBottom: "16px", fontFamily: "monospace" }}>
-                        Error ID: {error.digest}
+                        Error ID: {digest}
                     </p>
                 )}
                 <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>

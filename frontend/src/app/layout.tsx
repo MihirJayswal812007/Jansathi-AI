@@ -23,7 +23,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#0F172A",
+  themeColor: "#0A0A0F",
 };
 
 export default function RootLayout({
@@ -46,8 +46,13 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <a href="#main-content" className="skip-to-content">
+          Skip to content
+        </a>
         <ClientShell>
-          {children}
+          <main id="main-content">
+            {children}
+          </main>
         </ClientShell>
         <script
           dangerouslySetInnerHTML={{

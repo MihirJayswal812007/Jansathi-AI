@@ -3,7 +3,6 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
     Users,
@@ -18,13 +17,9 @@ import {
     TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
-import {
-    fetchDashboardStats,
-    fetchTrends,
-    type DashboardData,
-    type TrendData,
-} from "@/lib/apiClient";
 import AuthGuard from "@/components/common/AuthGuard";
+import { ErrorFallback } from "@/components/common/ErrorFallback";
+import { useDashboard } from "@/hooks/useDashboard";
 
 // ── Module config for display ────────────────────────────────
 const MODULE_DISPLAY: Record<
@@ -239,34 +234,7 @@ function TrendCard({
 
 // ── Main Dashboard Page ──────────────────────────────────────
 export default function DashboardPage() {
-    const [data, setData] = useState<DashboardData | null>(null);
-    const [trends, setTrends] = useState<TrendData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const loadData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const [statsData, trendsData] = await Promise.all([
-                fetchDashboardStats(),
-                fetchTrends(7).catch(() => null),
-            ]);
-
-            setData(statsData);
-            setTrends(trendsData);
-        } catch (err) {
-            console.error("Failed to fetch dashboard:", err);
-            setError("Network error — is the backend running?");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    const { stats: data, trends, isLoading: loading, error, refetch: loadData } = useDashboard();
 
     const moduleEntries = data
         ? Object.entries(data.moduleUsage).sort(([, a], [, b]) => b - a)
@@ -573,16 +541,10 @@ export default function DashboardPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center h-64 gap-4">
-                        <p style={{ color: "var(--text-muted)" }}>{error || "Failed to load data"}</p>
-                        <button
-                            onClick={loadData}
-                            className="px-4 py-2 rounded-lg text-sm font-medium"
-                            style={{ background: "#3B82F6", color: "white" }}
-                        >
-                            Retry
-                        </button>
-                    </div>
+                    <ErrorFallback
+                        error={error || "Failed to load data"}
+                        onRetry={loadData}
+                    />
                 )}
             </div>
         </AuthGuard>
