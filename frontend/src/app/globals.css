@@ -456,69 +456,222 @@ h4,
   }
 }
 
-/* ── Voice Button V2 (Glowing, Centered) ──────────────────── */
-.voice-btn {
+/* ── Voice Power Orb (Mic Button) ──────────────────────────── */
+
+/* Container — centers the orb and establishes stacking context */
+.voice-orb-container {
+  --orb-size: 160px;
+  --orb-accent: #6366F1;
   position: relative;
-  width: 128px;
-  height: 128px;
-  border-radius: var(--radius-full);
+  width: var(--orb-size);
+  height: var(--orb-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The dark sphere (clickable mic button) */
+.voice-orb-sphere {
+  position: relative;
+  z-index: 3;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--voice-listening);
+  background: radial-gradient(circle at 40% 35%, #1a1a2e, #0a0a0f 70%);
   color: white;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
-  box-shadow: 0 0 40px rgba(36, 99, 235, 0.4);
+  box-shadow:
+    inset 0 -4px 12px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(99, 102, 241, 0.15);
 }
 
-.voice-btn .mic-icon {
-  font-size: 48px;
+.voice-orb-sphere:hover {
+  transform: scale(1.06);
+  box-shadow:
+    inset 0 -4px 12px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(99, 102, 241, 0.3);
 }
 
-.voice-btn:hover {
-  transform: scale(1.05);
+.voice-orb-sphere.active {
+  box-shadow:
+    inset 0 -4px 12px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(99, 102, 241, 0.5),
+    0 0 80px rgba(139, 92, 246, 0.2);
 }
 
-.voice-btn:active {
-  transform: scale(0.95);
+/* Primary rotating ring — conic gradient creates the glowing edge */
+.voice-orb-ring {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+  background: conic-gradient(from 0deg,
+      transparent 0%,
+      rgba(99, 102, 241, 0.8) 15%,
+      rgba(139, 92, 246, 0.9) 25%,
+      transparent 40%,
+      transparent 60%,
+      rgba(59, 130, 246, 0.6) 75%,
+      rgba(139, 92, 246, 0.7) 85%,
+      transparent 100%);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 2.5px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 2.5px));
+  animation: orb-ring-spin 6s linear infinite;
 }
 
-.voice-btn.listening {
-  background: var(--voice-listening);
-  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5);
-  animation: voice-pulse 1.5s ease-in-out infinite;
+.voice-orb-ring.active {
+  opacity: 1;
+  animation: orb-ring-spin 3s linear infinite;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 3.5px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 3.5px));
 }
 
-/* Ambient glow behind voice button */
+/* Secondary ring — counter-rotation for depth */
+.voice-orb-ring-2 {
+  inset: -2px;
+  opacity: 0.25;
+  background: conic-gradient(from 180deg,
+      transparent 0%,
+      rgba(139, 92, 246, 0.5) 20%,
+      transparent 40%,
+      transparent 70%,
+      rgba(99, 102, 241, 0.4) 90%,
+      transparent 100%);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 1.5px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 1.5px));
+  animation: orb-ring-spin-reverse 8s linear infinite;
+}
+
+.voice-orb-ring-2.active {
+  opacity: 0.6;
+  animation: orb-ring-spin-reverse 4s linear infinite;
+}
+
+/* Ambient glow — expands when active */
+.voice-orb-glow {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  transform: scale(0.8);
+  opacity: 0.4;
+}
+
+.voice-orb-glow.active {
+  transform: scale(1.3);
+  opacity: 1;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.08) 50%, transparent 70%);
+}
+
+/* Pulse rings — expand outward when listening */
+.voice-orb-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Keyframes */
+@keyframes orb-ring-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orb-ring-spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* Waveform bars inside the orb sphere when listening */
+.voice-waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+}
+
+.voice-waveform .bar {
+  width: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 2px;
+  animation: orb-wave 0.8s ease-in-out infinite;
+}
+
+.voice-waveform .bar:nth-child(1) {
+  animation-delay: 0s;
+  height: 12px;
+}
+
+.voice-waveform .bar:nth-child(2) {
+  animation-delay: 0.1s;
+  height: 20px;
+}
+
+.voice-waveform .bar:nth-child(3) {
+  animation-delay: 0.2s;
+  height: 28px;
+}
+
+.voice-waveform .bar:nth-child(4) {
+  animation-delay: 0.3s;
+  height: 20px;
+}
+
+.voice-waveform .bar:nth-child(5) {
+  animation-delay: 0.4s;
+  height: 12px;
+}
+
+@keyframes orb-wave {
+
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+
+  50% {
+    transform: scaleY(1.2);
+  }
+}
+
+/* Legacy compat — keep voice-glow working for any remaining references */
 .voice-glow {
   position: absolute;
   inset: 0;
-  background: rgba(36, 99, 235, 0.2);
+  background: rgba(99, 102, 241, 0.15);
   filter: blur(60px);
   border-radius: 50%;
-  transform: scale(1.5);
+  transform: scale(1.8);
   pointer-events: none;
   transition: transform 0.5s ease;
 }
 
-@keyframes voice-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5);
-  }
-
-  70% {
-    box-shadow: 0 0 0 24px rgba(37, 99, 235, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
-  }
-}
 
 /* ── Bento Mode Cards V2 ─────────────────────────────────── */
 .mode-cards-grid {
@@ -1126,21 +1279,7 @@ input:focus:not(:focus-visible) {
   }
 }
 
-/* ── Voice Pulse Ring ─────────────────────────────────────── */
-.voice-btn.listening::before,
-.voice-btn.listening::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  opacity: 0;
-  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
 
-.voice-btn.listening::after {
-  animation-delay: 0.5s;
-}
 
 @keyframes pulse-ring {
   0% {
@@ -1186,8 +1325,10 @@ input:focus:not(:focus-visible) {
     transition-duration: 0.01ms !important;
   }
 
-  .voice-btn.listening {
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4) !important;
+  .voice-orb-ring,
+  .voice-orb-ring-2 {
+    animation: none !important;
+    opacity: 0.6;
   }
 
   html {
