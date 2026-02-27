@@ -1,0 +1,48 @@
+# ===== JanSathi AI — Git Ignore =====
+
+# ── Environment & Secrets ────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.key
+
+# ── Dependencies ─────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── Build Output ─────────────────────────────────────────────
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# ── Prisma ───────────────────────────────────────────────────
+# Generated Prisma Client (always regenerated from schema)
+backend/node_modules/.prisma/
+
+# ── OS Files ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── IDE / Editor ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Testing ──────────────────────────────────────────────────
+coverage/
+
+# ── Docker ───────────────────────────────────────────────────
+docker-compose.override.yml

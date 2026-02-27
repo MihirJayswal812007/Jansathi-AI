@@ -1,13 +1,30 @@
-node_modules
-dist
+# ── Secrets (never copy into image) ──────────────────────────
 .env
 .env.*
-tests
-*.test.ts
-vitest.config.ts
-test-output.txt
-test-result.json
+!.env.example
+
+# ── Source control ───────────────────────────────────────────
 .git
 .gitignore
+.github
+
+# ── Dependencies (rebuilt in image via npm ci) ───────────────
+node_modules
+
+# ── Tests (not needed in production image) ───────────────────
+tests/
+*.test.ts
+*.spec.ts
+coverage/
+vitest.config.*
+
+# ── IDE / OS ─────────────────────────────────────────────────
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# ── Docs / Assets ────────────────────────────────────────────
 README.md
 *.md
+scripts/

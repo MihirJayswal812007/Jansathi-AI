@@ -39,6 +39,15 @@ jobs:
       DIRECT_URL: postgresql://test:test@localhost:5432/jansathi_test
       SESSION_SECRET: ci-test-secret-do-not-use-in-prod
       NODE_ENV: test
+      RATE_LIMITER: memory
+      # LLM runs in demo mode when no real key is provided
+      GROQ_API_KEY: ""
+      # Disable optional features in CI
+      ENABLE_RAG: "false"
+      ENABLE_CONVERSATION_MEMORY: "false"
+      ENABLE_EMBEDDING_CACHE: "false"
+      ENABLE_MEMORY_SUMMARIZER: "false"
+      ENABLE_RERANKER: "false"
 
     steps:
       - name: Checkout
@@ -65,3 +74,17 @@ jobs:
 
       - name: Run tests
         run: npx vitest run
+
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

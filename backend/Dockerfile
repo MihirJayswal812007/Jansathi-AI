@@ -12,6 +12,10 @@ COPY prisma ./prisma
 COPY tsconfig.json ./
 COPY src ./src
 
+# Prisma generate needs a DATABASE_URL format (not a real connection).
+# This placeholder is ONLY used for client codegen — never for DB access.
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
+
 # Generate Prisma client + compile TypeScript
 RUN npx prisma generate && npx tsc
 
@@ -29,7 +33,13 @@ RUN npm ci --omit=dev
 
 # Copy Prisma schema (needed for runtime client)
 COPY prisma ./prisma
+
+# Same placeholder — prisma generate only needs the URL format
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN npx prisma generate
+
+# Remove placeholder — real DATABASE_URL comes from runtime env
+ENV DATABASE_URL=""
 
 # Copy compiled output from build stage
 COPY --from=build /app/dist ./dist
@@ -39,7 +49,7 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-# Runtime config
+# Runtime config (real secrets injected by orchestrator / docker-compose)
 ENV NODE_ENV=production
 ENV PORT=4000
 EXPOSE 4000

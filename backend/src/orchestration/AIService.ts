@@ -81,7 +81,7 @@ class AIServiceImpl {
             const memoryContext = request.userId
                 ? await conversationMemoryService.retrieve(
                     request.message,
-                    request.userId,
+                    request.userId as string,
                     request.conversationId
                 )
                 : "";
@@ -92,7 +92,7 @@ class AIServiceImpl {
             // 1.8. Inject long-term user profile summary (if available)
             let finalContext = enrichedContext;
             if (request.userId && memorySummarizer.config.enabled) {
-                const summary = await memorySummarizer.retrieveSummary(request.userId);
+                const summary = await memorySummarizer.retrieveSummary(request.userId as string);
                 if (summary) {
                     finalContext = `${enrichedContext}\n\nLong-term Profile Summary:\n${summary}`;
                 }
@@ -216,7 +216,7 @@ class AIServiceImpl {
 
             // Trigger async memory summarization (fire-and-forget)
             if (request.userId) {
-                memorySummarizer.summarizeIfNeeded(request.userId).catch(() => { });
+                memorySummarizer.summarizeIfNeeded(request.userId as string).catch(() => { });
             }
         } catch (error) {
             const durationMs = Date.now() - startTime;
