@@ -6,13 +6,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-
-// 3D background — loaded only client-side (no SSR, no hydration mismatch)
-const LandingBackground = dynamic(
-  () => import("@/components/3d/LandingBackground"),
-  { ssr: false, loading: () => null }
-);
+import { HeroGeometric } from "@/components/ui/shape-landing-hero";
 
 // ── Animation Variants ──────────────────────────────────────
 const fadeUp = {
@@ -63,306 +57,305 @@ const STATS = [
 export default function LandingPage() {
   return (
     <div className="landing" style={{ position: "relative" }}>
-      {/* ─── 3D Background Layer (behind everything) ────────── */}
-      <LandingBackground />
-
-      {/* ─── All content above the background ──────────────── */}
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {/* ─── Navbar ────────────────────────────────────────── */}
-        <nav className="landing-nav">
-          <div className="landing-nav-inner">
-            <Link href="/" className="landing-logo">
-              <span className="material-symbols-outlined" style={{ color: "#2563EB", fontSize: 24 }}>
-                auto_awesome
-              </span>
-              <span className="font-display" style={{ fontWeight: 600, fontSize: 18, color: "var(--text-primary)" }}>
-                JanSathi AI
-              </span>
+      {/* ─── All content ──────────────────────────────────── */}
+      {/* ─── Navbar ────────────────────────────────────────── */}
+      <nav className="landing-nav">
+        <div className="landing-nav-inner">
+          <Link href="/" className="landing-logo">
+            <span className="material-symbols-outlined" style={{ color: "#2563EB", fontSize: 24 }}>
+              auto_awesome
+            </span>
+            <span className="font-display" style={{ fontWeight: 600, fontSize: 18, color: "var(--text-primary)" }}>
+              JanSathi AI
+            </span>
+          </Link>
+          <div className="landing-nav-links">
+            <Link href="/chat" className="landing-nav-cta">
+              Start Chatting
             </Link>
-            <div className="landing-nav-links">
-              <Link href="/chat" className="landing-nav-cta">
-                Start Chatting
-              </Link>
-            </div>
           </div>
-        </nav>
+        </div>
+      </nav>
 
-        {/* ─── 1. Hero ───────────────────────────────────────── */}
-        <section className="landing-hero">
-          <motion.div
-            className="landing-hero-content"
-            initial="hidden"
-            animate="visible"
-            variants={stagger}
-          >
-            <motion.div className="landing-hero-badge" custom={0} variants={fadeUp}>
-              <span className="material-symbols-outlined" style={{ fontSize: 14, color: "#10B981" }}>check_circle</span>
-              <span>Powered by Retrieval-Augmented Generation</span>
-            </motion.div>
+      {/* ─── 1. Hero (Shape Landing Hero from 21st.dev) ──── */}
+      <HeroGeometric
+        badge="Powered by RAG + Intelligence Layers"
+        title1="Your AI Gateway to"
+        title2="Government Services"
+      />
 
-            <motion.h1 className="landing-hero-title font-display" custom={1} variants={fadeUp}>
-              Your AI-Powered Gateway to{" "}
-              <span className="landing-hero-gradient">Government Services</span>
-            </motion.h1>
-
-            <motion.p className="landing-hero-subtitle" custom={2} variants={fadeUp}>
-              Intelligent scheme matching powered by semantic retrieval,
-              conversation memory, and verified knowledge — designed for every citizen of India.
-            </motion.p>
-
-            <motion.div className="landing-hero-actions" custom={3} variants={fadeUp}>
-              <Link href="/chat" className="landing-btn landing-btn-primary">
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>chat</span>
-                Start a Conversation
-              </Link>
-              <a href="#how-it-works" className="landing-btn landing-btn-secondary">
-                Learn How It Works
-              </a>
-            </motion.div>
-
-            <motion.div className="landing-hero-stats" custom={4} variants={fadeUp}>
-              {STATS.map((s) => (
-                <div key={s.label} className="landing-stat">
-                  <span className="landing-stat-value font-display">{s.value}</span>
-                  <span className="landing-stat-label">{s.label}</span>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Gradient orb background */}
-          <div className="landing-hero-orb landing-hero-orb-1" />
-          <div className="landing-hero-orb landing-hero-orb-2" />
-        </section>
-
-        {/* ─── 2. Problem Statement ──────────────────────────── */}
-        <section className="landing-section">
-          <motion.div
-            className="landing-container"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
-              <span className="landing-section-tag">The Problem</span>
-              <h2 className="landing-section-title font-display">
-                1,500+ Government Schemes.<br />
-                <span style={{ color: "var(--text-muted)" }}>Most Citizens Can't Find the Right One.</span>
-              </h2>
-              <p className="landing-section-desc">
-                Language barriers, complex eligibility criteria, scattered information, and lack of personalization
-                leave millions without access to the services designed for them.
-              </p>
-            </motion.div>
-
-            <motion.div className="landing-problem-grid" custom={1} variants={fadeUp}>
-              {[
-                { value: "70%", label: "of eligible citizens unaware of applicable schemes", icon: "visibility_off" },
-                { value: "22+", label: "official languages — most portals only support Hindi/English", icon: "translate" },
-                { value: "45min", label: "average time to navigate a government portal", icon: "schedule" },
-              ].map((item) => (
-                <div key={item.label} className="landing-problem-card">
-                  <span className="material-symbols-outlined" style={{ fontSize: 28, color: "var(--error)", marginBottom: 12 }}>
-                    {item.icon}
-                  </span>
-                  <span className="landing-problem-value font-display">{item.value}</span>
-                  <span className="landing-problem-label">{item.label}</span>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* ─── 3. How It Works (Pipeline) ────────────────────── */}
-        <section id="how-it-works" className="landing-section landing-section-alt">
-          <motion.div
-            className="landing-container"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
-              <span className="landing-section-tag">How It Works</span>
-              <h2 className="landing-section-title font-display">
-                From Question to Verified Answer —{" "}
-                <span style={{ color: "var(--janseva-primary)" }}>In Seconds</span>
-              </h2>
-            </motion.div>
-
-            <motion.div className="landing-pipeline" custom={1} variants={fadeUp}>
-              {PIPELINE_STEPS.map((step, i) => (
-                <div key={step.label} className="landing-pipeline-step">
-                  <div className="landing-pipeline-icon" style={{ borderColor: step.color }}>
-                    <span className="material-symbols-outlined" style={{ color: step.color, fontSize: 24 }}>
-                      {step.icon}
-                    </span>
-                  </div>
-                  <div className="landing-pipeline-text">
-                    <span className="landing-pipeline-title font-display">{step.label}</span>
-                    <span className="landing-pipeline-desc">{step.desc}</span>
-                  </div>
-                  {i < PIPELINE_STEPS.length - 1 && (
-                    <div className="landing-pipeline-arrow">
-                      <span className="material-symbols-outlined" style={{ color: "var(--text-muted)", fontSize: 20 }}>
-                        arrow_forward
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* ─── 4. Intelligence Stack ─────────────────────────── */}
-        <section className="landing-section">
-          <motion.div
-            className="landing-container"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
-              <span className="landing-section-tag">Intelligence Architecture</span>
-              <h2 className="landing-section-title font-display">
-                Four Layers of Context.
-                <br />
-                <span style={{ color: "var(--intel-memory)" }}>One Intelligent Response.</span>
-              </h2>
-              <p className="landing-section-desc">
-                Every response is grounded in verified documents, enriched with your conversation history,
-                informed by your long-term profile, and ranked for maximum relevance.
-              </p>
-            </motion.div>
-
-            <motion.div className="landing-intel-grid" custom={1} variants={fadeUp}>
-              {INTEL_CARDS.map((card, i) => (
-                <motion.div key={card.title} className="landing-intel-card" custom={i + 2} variants={fadeUp}>
-                  <div className="landing-intel-icon" style={{ background: `${card.color}18` }}>
-                    <span className="material-symbols-outlined" style={{ color: card.color, fontSize: 24 }}>
-                      {card.icon}
-                    </span>
-                  </div>
-                  <h3 className="landing-intel-title font-display">{card.title}</h3>
-                  <p className="landing-intel-desc">{card.desc}</p>
-                  <div className="landing-intel-line" style={{ background: card.color }} />
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* ─── 5. Features Grid ──────────────────────────────── */}
-        <section className="landing-section landing-section-alt">
-          <motion.div
-            className="landing-container"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
-              <span className="landing-section-tag">Capabilities</span>
-              <h2 className="landing-section-title font-display">
-                Production-Grade.{" "}
-                <span style={{ color: "var(--success)" }}>Not a Prototype.</span>
-              </h2>
-            </motion.div>
-
-            <motion.div className="landing-features-grid" custom={1} variants={fadeUp}>
-              {FEATURES.map((f, i) => (
-                <motion.div key={f.title} className="landing-feature-card" custom={i + 2} variants={fadeUp}>
-                  <span className="material-symbols-outlined landing-feature-icon">
-                    {f.icon}
-                  </span>
-                  <h3 className="landing-feature-title">{f.title}</h3>
-                  <p className="landing-feature-desc">{f.desc}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* ─── 6. Trust & Security ───────────────────────────── */}
-        <section className="landing-section">
-          <motion.div
-            className="landing-container"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-          >
-            <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
-              <span className="landing-section-tag">Security</span>
-              <h2 className="landing-section-title font-display">
-                Your Data. Your Privacy.{" "}
-                <span style={{ color: "var(--janseva-primary)" }}>No Compromise.</span>
-              </h2>
-            </motion.div>
-
-            <motion.div className="landing-trust-grid" custom={1} variants={fadeUp}>
-              {[
-                { icon: "shield", title: "User-Isolated Memory", desc: "Every user's conversation memory and profile is completely isolated. No cross-user data leakage — ever." },
-                { icon: "lock", title: "OTP-Only Authentication", desc: "No passwords to steal. Phone-based OTP with rate limiting, brute-force protection, and session cookies." },
-                { icon: "key", title: "No Secrets in Code", desc: "All credentials are environment-injected at runtime. Git history cleaned. Gitleaks CI scanning active." },
-                { icon: "speed", title: "Rate-Limited by Design", desc: "Redis-backed rate limiting with per-user quotas. Automatic scaling. Memory fallback for zero-downtime." },
-              ].map((item, i) => (
-                <motion.div key={item.title} className="landing-trust-card" custom={i + 2} variants={fadeUp}>
-                  <span className="material-symbols-outlined" style={{ color: "var(--janseva-primary)", fontSize: 24 }}>
-                    {item.icon}
-                  </span>
-                  <h3 className="landing-trust-title font-display">{item.title}</h3>
-                  <p className="landing-trust-desc">{item.desc}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* ─── 7. CTA Footer ─────────────────────────────────── */}
-        <section className="landing-cta">
-          <motion.div
-            className="landing-container"
-            initial="hidden"
-            whileInView="visible"
+      {/* ─── Hero Stats & CTA (below hero) ───────────────── */}
+      <section style={{ background: "var(--bg-primary)", padding: "48px 0 0" }}>
+        <div className="landing-container" style={{ textAlign: "center" }}>
+          <motion.p
+            className="landing-hero-subtitle"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            variants={stagger}
+            style={{ marginBottom: 24 }}
           >
-            <motion.h2 className="landing-cta-title font-display" custom={0} variants={fadeUp}>
-              Ready to access the schemes you deserve?
-            </motion.h2>
-            <motion.p className="landing-cta-desc" custom={1} variants={fadeUp}>
-              Start a conversation in Hindi or English. No account required.
-            </motion.p>
-            <motion.div className="landing-cta-actions" custom={2} variants={fadeUp}>
-              <Link href="/chat" className="landing-btn landing-btn-primary landing-btn-lg">
-                <span className="material-symbols-outlined" style={{ fontSize: 22 }}>chat</span>
-                Start a Conversation
-              </Link>
-              <Link href="/login" className="landing-btn landing-btn-ghost">
-                Sign in with OTP
-              </Link>
-            </motion.div>
+            Intelligent scheme matching with semantic retrieval, conversation memory,
+            and verified knowledge — designed for every citizen of India.
+          </motion.p>
+          <motion.div
+            className="landing-hero-actions"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+          >
+            <Link href="/chat" className="landing-btn landing-btn-primary">
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>chat</span>
+              Start a Conversation
+            </Link>
+            <a href="#how-it-works" className="landing-btn landing-btn-secondary">
+              Learn How It Works
+            </a>
           </motion.div>
-        </section>
+          <motion.div
+            className="landing-hero-stats"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            {STATS.map((s) => (
+              <div key={s.label} className="landing-stat">
+                <span className="landing-stat-value font-display">{s.value}</span>
+                <span className="landing-stat-label">{s.label}</span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
-        {/* ─── Footer ────────────────────────────────────────── */}
-        <footer className="landing-footer">
-          <div className="landing-container">
-            <div className="landing-footer-inner">
-              <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
-                © 2026 JanSathi AI · Built with ❤️ for Bharat
-              </span>
-              <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
-                201 automated tests · Production-grade architecture
-              </span>
-            </div>
+      {/* ─── 2. Problem Statement ──────────────────────────── */}
+      <section className="landing-section">
+        <motion.div
+          className="landing-container"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+        >
+          <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+            <span className="landing-section-tag">The Problem</span>
+            <h2 className="landing-section-title font-display">
+              1,500+ Government Schemes.<br />
+              <span style={{ color: "var(--text-muted)" }}>Most Citizens Can't Find the Right One.</span>
+            </h2>
+            <p className="landing-section-desc">
+              Language barriers, complex eligibility criteria, scattered information, and lack of personalization
+              leave millions without access to the services designed for them.
+            </p>
+          </motion.div>
+
+          <motion.div className="landing-problem-grid" custom={1} variants={fadeUp}>
+            {[
+              { value: "70%", label: "of eligible citizens unaware of applicable schemes", icon: "visibility_off" },
+              { value: "22+", label: "official languages — most portals only support Hindi/English", icon: "translate" },
+              { value: "45min", label: "average time to navigate a government portal", icon: "schedule" },
+            ].map((item) => (
+              <div key={item.label} className="landing-problem-card">
+                <span className="material-symbols-outlined" style={{ fontSize: 28, color: "var(--error)", marginBottom: 12 }}>
+                  {item.icon}
+                </span>
+                <span className="landing-problem-value font-display">{item.value}</span>
+                <span className="landing-problem-label">{item.label}</span>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── 3. How It Works (Pipeline) ────────────────────── */}
+      <section id="how-it-works" className="landing-section landing-section-alt">
+        <motion.div
+          className="landing-container"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+        >
+          <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+            <span className="landing-section-tag">How It Works</span>
+            <h2 className="landing-section-title font-display">
+              From Question to Verified Answer —{" "}
+              <span style={{ color: "var(--janseva-primary)" }}>In Seconds</span>
+            </h2>
+          </motion.div>
+
+          <motion.div className="landing-pipeline" custom={1} variants={fadeUp}>
+            {PIPELINE_STEPS.map((step, i) => (
+              <div key={step.label} className="landing-pipeline-step">
+                <div className="landing-pipeline-icon" style={{ borderColor: step.color }}>
+                  <span className="material-symbols-outlined" style={{ color: step.color, fontSize: 24 }}>
+                    {step.icon}
+                  </span>
+                </div>
+                <div className="landing-pipeline-text">
+                  <span className="landing-pipeline-title font-display">{step.label}</span>
+                  <span className="landing-pipeline-desc">{step.desc}</span>
+                </div>
+                {i < PIPELINE_STEPS.length - 1 && (
+                  <div className="landing-pipeline-arrow">
+                    <span className="material-symbols-outlined" style={{ color: "var(--text-muted)", fontSize: 20 }}>
+                      arrow_forward
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── 4. Intelligence Stack ─────────────────────────── */}
+      <section className="landing-section">
+        <motion.div
+          className="landing-container"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+        >
+          <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+            <span className="landing-section-tag">Intelligence Architecture</span>
+            <h2 className="landing-section-title font-display">
+              Four Layers of Context.
+              <br />
+              <span style={{ color: "var(--intel-memory)" }}>One Intelligent Response.</span>
+            </h2>
+            <p className="landing-section-desc">
+              Every response is grounded in verified documents, enriched with your conversation history,
+              informed by your long-term profile, and ranked for maximum relevance.
+            </p>
+          </motion.div>
+
+          <motion.div className="landing-intel-grid" custom={1} variants={fadeUp}>
+            {INTEL_CARDS.map((card, i) => (
+              <motion.div key={card.title} className="landing-intel-card" custom={i + 2} variants={fadeUp}>
+                <div className="landing-intel-icon" style={{ background: `${card.color}18` }}>
+                  <span className="material-symbols-outlined" style={{ color: card.color, fontSize: 24 }}>
+                    {card.icon}
+                  </span>
+                </div>
+                <h3 className="landing-intel-title font-display">{card.title}</h3>
+                <p className="landing-intel-desc">{card.desc}</p>
+                <div className="landing-intel-line" style={{ background: card.color }} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── 5. Features Grid ──────────────────────────────── */}
+      <section className="landing-section landing-section-alt">
+        <motion.div
+          className="landing-container"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+        >
+          <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+            <span className="landing-section-tag">Capabilities</span>
+            <h2 className="landing-section-title font-display">
+              Production-Grade.{" "}
+              <span style={{ color: "var(--success)" }}>Not a Prototype.</span>
+            </h2>
+          </motion.div>
+
+          <motion.div className="landing-features-grid" custom={1} variants={fadeUp}>
+            {FEATURES.map((f, i) => (
+              <motion.div key={f.title} className="landing-feature-card" custom={i + 2} variants={fadeUp}>
+                <span className="material-symbols-outlined landing-feature-icon">
+                  {f.icon}
+                </span>
+                <h3 className="landing-feature-title">{f.title}</h3>
+                <p className="landing-feature-desc">{f.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── 6. Trust & Security ───────────────────────────── */}
+      <section className="landing-section">
+        <motion.div
+          className="landing-container"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+        >
+          <motion.div className="landing-section-header" custom={0} variants={fadeUp}>
+            <span className="landing-section-tag">Security</span>
+            <h2 className="landing-section-title font-display">
+              Your Data. Your Privacy.{" "}
+              <span style={{ color: "var(--janseva-primary)" }}>No Compromise.</span>
+            </h2>
+          </motion.div>
+
+          <motion.div className="landing-trust-grid" custom={1} variants={fadeUp}>
+            {[
+              { icon: "shield", title: "User-Isolated Memory", desc: "Every user's conversation memory and profile is completely isolated. No cross-user data leakage — ever." },
+              { icon: "lock", title: "OTP-Only Authentication", desc: "No passwords to steal. Phone-based OTP with rate limiting, brute-force protection, and session cookies." },
+              { icon: "key", title: "No Secrets in Code", desc: "All credentials are environment-injected at runtime. Git history cleaned. Gitleaks CI scanning active." },
+              { icon: "speed", title: "Rate-Limited by Design", desc: "Redis-backed rate limiting with per-user quotas. Automatic scaling. Memory fallback for zero-downtime." },
+            ].map((item, i) => (
+              <motion.div key={item.title} className="landing-trust-card" custom={i + 2} variants={fadeUp}>
+                <span className="material-symbols-outlined" style={{ color: "var(--janseva-primary)", fontSize: 24 }}>
+                  {item.icon}
+                </span>
+                <h3 className="landing-trust-title font-display">{item.title}</h3>
+                <p className="landing-trust-desc">{item.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── 7. CTA Footer ─────────────────────────────────── */}
+      <section className="landing-cta">
+        <motion.div
+          className="landing-container"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={stagger}
+        >
+          <motion.h2 className="landing-cta-title font-display" custom={0} variants={fadeUp}>
+            Ready to access the schemes you deserve?
+          </motion.h2>
+          <motion.p className="landing-cta-desc" custom={1} variants={fadeUp}>
+            Start a conversation in Hindi or English. No account required.
+          </motion.p>
+          <motion.div className="landing-cta-actions" custom={2} variants={fadeUp}>
+            <Link href="/chat" className="landing-btn landing-btn-primary landing-btn-lg">
+              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>chat</span>
+              Start a Conversation
+            </Link>
+            <Link href="/login" className="landing-btn landing-btn-ghost">
+              Sign in with OTP
+            </Link>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── Footer ────────────────────────────────────────── */}
+      <footer className="landing-footer">
+        <div className="landing-container">
+          <div className="landing-footer-inner">
+            <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
+              © 2026 JanSathi AI · Built with ❤️ for Bharat
+            </span>
+            <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
+              201 automated tests · Production-grade architecture
+            </span>
           </div>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }
