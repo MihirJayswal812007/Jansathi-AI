@@ -34,7 +34,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 export default function LoginPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const redirectTo = searchParams.get("redirect") || "/";
+    const redirectTo = searchParams.get("redirect") || "/chat";
     const { setAuth } = useUserStore();
 
     // Application state
@@ -178,7 +178,7 @@ export default function LoginPage() {
                 setAuth(res.session);
 
                 // If user is admin but not redirecting to admin dashboard, point them there
-                if (res.session.role?.toLowerCase() === "admin" && redirectTo === "/") {
+                if (res.session.role?.toLowerCase() === "admin" && (redirectTo === "/" || redirectTo === "/chat")) {
                     router.push("/admin/dashboard");
                 } else {
                     router.push(redirectTo);

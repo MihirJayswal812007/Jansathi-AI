@@ -69,7 +69,10 @@ export default function LandingPage() {
               JanSathi AI
             </span>
           </Link>
-          <div className="landing-nav-links">
+          <div className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link href="/login" className="font-display hover:bg-white/5" style={{ color: "var(--text-primary)", padding: "8px 16px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", fontSize: "14px", fontWeight: 500, textDecoration: "none", transition: "background 0.2s ease" }}>
+              Sign In
+            </Link>
             <Link href="/chat" className="landing-nav-cta">
               Start Chatting
             </Link>
