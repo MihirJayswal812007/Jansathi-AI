@@ -10,7 +10,7 @@ import AppShell from "@/components/common/AppShell";
 import AuthProvider from "@/components/common/AuthProvider";
 
 // Routes that should render WITHOUT the sidebar (public/marketing pages)
-const PUBLIC_ROUTES = ["/", "/about", "/how-it-works"];
+const PUBLIC_ROUTES = ["/", "/about", "/how-it-works", "/login", "/signup"];
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
