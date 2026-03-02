@@ -21,6 +21,8 @@ export interface IRateLimiterStore {
     get(key: string): Promise<RateLimitRecord | undefined>;
     set(key: string, record: RateLimitRecord): Promise<void>;
     delete(key: string): Promise<void>;
+    /** Atomically increment counter and return the updated record */
+    increment(key: string, windowMs: number): Promise<RateLimitRecord>;
 }
 
 // ── In-memory fallback (always available) ───────────────────
@@ -52,6 +54,26 @@ export class MemoryStore implements IRateLimiterStore {
 
     async delete(key: string): Promise<void> {
         this.map.delete(key);
+    }
+
+    /**
+     * Atomic increment — no read-modify-write race condition.
+     * Single-threaded JS ensures this runs without interruption.
+     */
+    async increment(key: string, windowMs: number): Promise<RateLimitRecord> {
+        const now = Date.now();
+        const existing = this.map.get(key);
+
+        if (!existing || now > existing.resetTime) {
+            // New window
+            const record: RateLimitRecord = { count: 1, resetTime: now + windowMs };
+            this.map.set(key, record);
+            return record;
+        }
+
+        // Increment within existing window
+        existing.count++;
+        return { count: existing.count, resetTime: existing.resetTime };
     }
 
     /** Exposed for testing — number of active entries */

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import ClientShell from "@/components/common/ClientShell";
 
 export const metadata: Metadata = {
   title: "JanSathi AI — Your Digital Companion",
@@ -49,11 +48,9 @@ export default function RootLayout({
         <a href="#main-content" className="skip-to-content">
           Skip to content
         </a>
-        <ClientShell>
-          <main id="main-content">
-            {children}
-          </main>
-        </ClientShell>
+        <main id="main-content">
+          {children}
+        </main>
         <script
           dangerouslySetInnerHTML={{
             __html: `

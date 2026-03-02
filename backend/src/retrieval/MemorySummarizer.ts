@@ -76,28 +76,29 @@ export class MemorySummarizer {
             const vectorStr = `[${embedding.join(",")}]`;
             const summaryId = `lts_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
-            // Upsert into long_term_memory
-            await prisma.$executeRawUnsafe(
-                `INSERT INTO long_term_memory (id, user_id, summary, embedding, source_count, last_updated)
-                 VALUES ($1, $2, $3, $4::vector, $5, NOW())
-                 ON CONFLICT (id) DO UPDATE SET
-                    summary = EXCLUDED.summary,
-                    embedding = EXCLUDED.embedding,
-                    source_count = EXCLUDED.source_count,
-                    last_updated = NOW()`,
-                summaryId,
-                userId,
-                summary,
-                vectorStr,
-                entries.length
-            );
-
-            // Delete summarized entries from conversation_memory
+            // Atomic: upsert summary + delete source entries in a transaction
+            // ON CONFLICT (user_id) ensures only one summary per user
             const ids = entries.map((e) => e.id);
-            await prisma.$executeRawUnsafe(
-                `DELETE FROM conversation_memory WHERE id = ANY($1::text[])`,
-                ids
-            );
+            await prisma.$transaction([
+                prisma.$executeRawUnsafe(
+                    `INSERT INTO long_term_memory (id, user_id, summary, embedding, source_count, last_updated)
+                     VALUES ($1, $2, $3, $4::vector, $5, NOW())
+                     ON CONFLICT (user_id) DO UPDATE SET
+                        summary = EXCLUDED.summary,
+                        embedding = EXCLUDED.embedding,
+                        source_count = long_term_memory.source_count + EXCLUDED.source_count,
+                        last_updated = NOW()`,
+                    summaryId,
+                    userId,
+                    summary,
+                    vectorStr,
+                    entries.length
+                ),
+                prisma.$executeRawUnsafe(
+                    `DELETE FROM conversation_memory WHERE id = ANY($1::text[])`,
+                    ids
+                ),
+            ]);
 
             logger.info("memory_summarizer.completed", {
                 userId: userId.slice(0, 8) + "...",

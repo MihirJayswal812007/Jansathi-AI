@@ -48,17 +48,12 @@ export function createRateLimiter(overrideConfig?: { max: number; windowMs: numb
         const routeKey = req.baseUrl || req.path;
         const config = overrideConfig ?? getRouteConfig(req);
         const storeKey = `${ip}:${routeKey}`;
-        const now = Date.now();
 
-        const record = await store.get(storeKey);
+        // Atomic increment — no read-modify-write race condition
+        const record = await store.increment(storeKey, config.windowMs);
 
-        if (!record || now > record.resetTime) {
-            await store.set(storeKey, { count: 1, resetTime: now + config.windowMs });
-            return next();
-        }
-
-        if (record.count >= config.max) {
-            const retryAfterMs = record.resetTime - now;
+        if (record.count > config.max) {
+            const retryAfterMs = record.resetTime - Date.now();
             logger.warn("middleware.rate_limit.exceeded", { ip, routeKey, count: record.count });
             return res.status(429).json({
                 error: "RATE_LIMITED",
@@ -68,8 +63,6 @@ export function createRateLimiter(overrideConfig?: { max: number; windowMs: numb
             });
         }
 
-        record.count++;
-        await store.set(storeKey, record);
         next();
     };
 }

@@ -4,6 +4,7 @@
 
 import prisma from "../models/prisma";
 import logger from "../utils/logger";
+import { memoryPruner } from "../retrieval/MemoryPruner";
 
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 const OTP_RETENTION_HOURS = 24; // keep verified/expired OTPs for 24h then delete
@@ -57,10 +58,27 @@ async function cleanupExpiredOTPs(): Promise<void> {
     }
 }
 
+// ── Memory Pruning ──────────────────────────────────────────
+async function pruneConversationMemory(): Promise<void> {
+    if (!process.env.ENABLE_CONVERSATION_MEMORY) return;
+
+    try {
+        const result = await memoryPruner.prune();
+        if (result.deletedCount > 0) {
+            logger.info("jobs.memory_prune.ran", result);
+        }
+    } catch (error) {
+        logger.error("jobs.memory_prune.failed", {
+            error: error instanceof Error ? error.message : String(error),
+        });
+    }
+}
+
 // ── Combined Cleanup ────────────────────────────────────────
 async function runCleanup(): Promise<void> {
     await cleanupExpiredSessions();
     await cleanupExpiredOTPs();
+    await pruneConversationMemory();
 }
 
 let cleanupTimer: ReturnType<typeof setInterval> | null = null;

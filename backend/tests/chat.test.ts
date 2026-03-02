@@ -81,31 +81,30 @@ describe("POST /api/chat", () => {
 });
 
 describe("PATCH /api/chat/:id/feedback", () => {
-    it("should return 400 for missing satisfaction", async () => {
+    it("should return 401 for unauthenticated request (missing satisfaction)", async () => {
         const res = await request
             .patch("/api/chat/some-id/feedback")
             .send({});
 
-        expect(res.status).toBe(400);
-        expect(res.body.error).toBe("INVALID_INPUT");
+        expect(res.status).toBe(401);
     });
 
-    it("should return 400 for out-of-range satisfaction", async () => {
+    it("should return 401 for unauthenticated request (out-of-range satisfaction)", async () => {
         const res = await request
             .patch("/api/chat/some-id/feedback")
             .send({ satisfaction: 10 });
 
-        expect(res.status).toBe(400);
-        expect(res.body.error).toBe("INVALID_INPUT");
+        expect(res.status).toBe(401);
     });
 
-    it("should accept valid feedback for existing conversation", async () => {
-        // Create a user + conversation to submit feedback for
-        const { user } = await createAuthenticatedUser();
+    it("should accept valid feedback for authenticated user's own conversation", async () => {
+        // Create a user + session + conversation to submit feedback for
+        const { user, session } = await createAuthenticatedUser();
         const convId = await createTestConversation(user.id);
 
         const res = await request
             .patch(`/api/chat/${convId}/feedback`)
+            .set("Cookie", session.cookie)
             .send({ satisfaction: 5 });
 
         expect(res.status).toBe(200);

@@ -3,7 +3,7 @@
 // malformed payloads, rate limit bypass. Each MUST assert failure.
 
 import { describe, it, expect, afterAll } from "vitest";
-import { request, createTestSession, createAuthenticatedUser, createTestAdmin, createTestUser, SESSION_COOKIE } from "./helpers/setup";
+import { request, createTestSession, createAuthenticatedUser, createTestAdmin, createTestUser, createTestConversation, SESSION_COOKIE } from "./helpers/setup";
 import { cleanupTestData, disconnectDb } from "./helpers/db";
 import prisma from "../src/models/prisma";
 
@@ -216,10 +216,10 @@ describe("Security: cookie tampering", () => {
     });
 });
 
-// ── 6. Cross-User Data Access ───────────────────────────────
+// ── 6. Cross-User Data Access (IDOR protection) ────────────
 
-describe("Security: cross-user data isolation", () => {
-    it("should not allow user A to access user B's conversations", async () => {
+describe("Security: cross-user data isolation (IDOR)", () => {
+    it("should return 404 when user A accesses user B's conversation", async () => {
         const userA = await createAuthenticatedUser();
         const userB = await createAuthenticatedUser();
 
@@ -228,18 +228,87 @@ describe("Security: cross-user data isolation", () => {
             data: { userId: userB.user.id, mode: "janseva" },
         });
 
-        // User A tries to access user B's conversation
+        // User A tries to access user B's conversation — should get 404
         const res = await request
             .get(`/api/user/conversations/${conv.id}`)
             .set("Cookie", userA.session.cookie);
 
-        // Should either 404, 403, or return empty — NOT return user B's messages
-        if (res.status === 200 && res.body.data) {
-            // If 200, verify it doesn't contain user B's data
-            // (endpoint may return empty or own data, not cross-user)
-            expect(res.body.data.userId === userB.user.id && res.body.data.messages?.length > 0).toBe(false);
-        } else {
-            expect([403, 404, 400, 500]).toContain(res.status);
-        }
+        expect(res.status).toBe(404);
+    });
+
+    it("should return own conversation when userId matches", async () => {
+        const { user, session } = await createAuthenticatedUser();
+
+        const conv = await prisma.conversation.create({
+            data: { userId: user.id, mode: "janseva" },
+        });
+
+        const res = await request
+            .get(`/api/user/conversations/${conv.id}`)
+            .set("Cookie", session.cookie);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+    });
+});
+
+// ── 7. Admin Escalation Prevention ──────────────────────────
+
+describe("Security: admin escalation removed", () => {
+    it("should NOT promote session to admin via adminSecret body field", async () => {
+        const { session } = await createAuthenticatedUser({ role: "user" });
+
+        const res = await request
+            .post("/api/auth/session")
+            .set("Cookie", session.cookie)
+            .send({ adminSecret: process.env.ADMIN_SECRET || "any-secret" });
+
+        expect(res.status).toBe(200);
+        // Session must remain "user" — no promotion occurred
+        expect(res.body.session.role).toBe("user");
+        expect(res.body.promoted).toBeUndefined();
+    });
+});
+
+// ── 8. Feedback Endpoint Auth ───────────────────────────────
+
+describe("Security: feedback endpoint auth", () => {
+    it("should reject feedback without authentication", async () => {
+        const { user } = await createAuthenticatedUser();
+        const convId = await createTestConversation(user.id);
+
+        const res = await request
+            .patch(`/api/chat/${convId}/feedback`)
+            .send({ satisfaction: 5 });
+
+        expect(res.status).toBe(401);
+    });
+
+    it("should reject feedback on another user's conversation", async () => {
+        const userA = await createAuthenticatedUser();
+        const userB = await createAuthenticatedUser();
+
+        const convId = await createTestConversation(userB.user.id);
+
+        const res = await request
+            .patch(`/api/chat/${convId}/feedback`)
+            .set("Cookie", userA.session.cookie)
+            .send({ satisfaction: 4 });
+
+        // Should fail — user A doesn't own user B's conversation
+        expect(res.status).toBe(500);
+    });
+
+    it("should allow feedback on own conversation", async () => {
+        const { user, session } = await createAuthenticatedUser();
+        const convId = await createTestConversation(user.id);
+
+        const res = await request
+            .patch(`/api/chat/${convId}/feedback`)
+            .set("Cookie", session.cookie)
+            .send({ satisfaction: 5 });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
     });
 });

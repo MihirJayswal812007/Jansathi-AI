@@ -201,6 +201,11 @@ class AIServiceImpl {
                 tokenUsage: currentResult.tokenUsage,
             });
 
+            // Trigger async memory summarization (fire-and-forget)
+            if (request.userId) {
+                memorySummarizer.summarizeIfNeeded(request.userId as string).catch(() => { });
+            }
+
             return {
                 content: validation.sanitizedContent,
                 mode: request.mode,
@@ -210,14 +215,6 @@ class AIServiceImpl {
                 toolsUsed,
                 requestId,
             };
-
-            // Note: memory storage happens in chat.service.ts after message persistence
-            // to avoid storing messages that fail to persist.
-
-            // Trigger async memory summarization (fire-and-forget)
-            if (request.userId) {
-                memorySummarizer.summarizeIfNeeded(request.userId as string).catch(() => { });
-            }
         } catch (error) {
             const durationMs = Date.now() - startTime;
 

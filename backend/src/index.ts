@@ -29,6 +29,9 @@ import { metricsCollector } from "./observability/MetricsCollector";
 import { llmProvider } from "./providers/llm";
 import { LLM } from "./config/env";
 
+// ── Security Middleware ─────────────────────────────────────
+import { csrfProtection } from "./middleware/csrf";
+
 // ── App Factory (testable) ──────────────────────────────────
 export function createApp() {
     const app = express();
@@ -45,6 +48,7 @@ export function createApp() {
     );
     app.use(express.json({ limit: "1mb" }));
     app.use(cookieParser());
+    app.use(csrfProtection);
 
     // ── Health Check (with DB probe) ────────────────────────
     app.get("/api/health", async (_req, res) => {

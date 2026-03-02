@@ -156,10 +156,10 @@ userRouter.get("/conversations/:id", async (req: Request, res: Response) => {
         }
 
         const id = req.params.id as string;
-        const conversation = await getConversationHistory(id);
+        const conversation = await getConversationHistory(id, undefined, userId);
 
         if (!conversation) {
-            return sendError(res, "INVALID_INPUT", "Conversation not found", requestId);
+            return sendError(res, "NOT_FOUND", "Conversation not found", requestId);
         }
 
         res.json({ success: true, data: conversation, requestId });
