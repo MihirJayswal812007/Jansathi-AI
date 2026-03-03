@@ -6,7 +6,7 @@ services:
     env: node
     rootDir: backend
     # Install dependencies, generate Prisma client, and compile TypeScript
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     # Start the compiled Express server
     startCommand: npm start
     envVars:
@@ -34,7 +34,7 @@ services:
     env: node
     rootDir: frontend
     # Install dependencies and build Next.js for production
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     # Start the Next.js production server
     startCommand: npm start
     envVars:
