@@ -1,0 +1,46 @@
+services:
+  # ── Backend Service ──────────────────────────────────────────
+  - type: web
+    name: jansathi-backend
+    env: node
+    rootDir: backend
+    # Install dependencies, generate Prisma client, and compile TypeScript
+    buildCommand: npm install && npm run build
+    # Start the compiled Express server
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # These will be prompted in the Render dashboard during setup:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ADMIN_SECRET
+        sync: false
+      # Automatically allow the frontend domain once deployed
+      - key: ALLOWED_ORIGINS
+        value: "https://jansathi-frontend.onrender.com"
+
+  # ── Frontend Service ─────────────────────────────────────────
+  - type: web
+    name: jansathi-frontend
+    env: node
+    rootDir: frontend
+    # Install dependencies and build Next.js for production
+    buildCommand: npm install && npm run build
+    # Start the Next.js production server
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Automatically point to the backend domain once deployed
+      - key: NEXT_PUBLIC_API_URL
+        value: "https://jansathi-backend.onrender.com"
+      # This will be prompted in the Render dashboard
+      - key: NEXT_PUBLIC_ADMIN_SECRET
+        sync: false
