@@ -2,6 +2,7 @@ services:
   # ── Backend Service ──────────────────────────────────────────
   - type: web
     name: jansathi-backend
+    plan: free
     env: node
     rootDir: backend
     # Install dependencies, generate Prisma client, and compile TypeScript
@@ -29,6 +30,7 @@ services:
   # ── Frontend Service ─────────────────────────────────────────
   - type: web
     name: jansathi-frontend
+    plan: free
     env: node
     rootDir: frontend
     # Install dependencies and build Next.js for production
