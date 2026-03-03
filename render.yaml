@@ -20,10 +20,9 @@ services:
     runtime: node
     rootDir: backend
 
-    # Build: install ALL deps, generate Prisma client, compile TS.
-    # We use explicit ./node_modules/.bin paths because Render's sh
-    # sometimes fails to resolve npx binaries (Permission denied).
-    buildCommand: "npm install && node ./node_modules/.bin/prisma generate && ./node_modules/.bin/tsc"
+    # Build: install deps, fix Linux permissions on bin scripts, then build.
+    # Render's npm sometimes strips +x from node_modules/.bin/ scripts.
+    buildCommand: "npm install && chmod +x ./node_modules/.bin/* && npx prisma generate && npx tsc"
     startCommand: node dist/index.js
 
     envVars:
