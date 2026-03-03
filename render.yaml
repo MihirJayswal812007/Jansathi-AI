@@ -19,7 +19,6 @@ services:
     plan: free
     runtime: node
     rootDir: backend
-    region: singapore
 
     # Build: install ALL deps, generate Prisma client, compile TS.
     # We use explicit ./node_modules/.bin paths because Render's sh
@@ -49,7 +48,6 @@ services:
     plan: free
     runtime: node
     rootDir: frontend
-    region: singapore
 
     buildCommand: npm install && npm run build
     startCommand: npm start
