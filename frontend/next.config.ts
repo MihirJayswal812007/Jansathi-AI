@@ -1,10 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // ── Performance: Dev compilation ──────────────────────────
-  // Remove output: "standalone" — it forces full server bundling on every build.
-  // Only enable for production Dockerized deployments.
-  // output: "standalone",  // <-- uncomment for production Docker deploy
+  // ── Performance: Production standalone output ──────────────
+  // Standalone mode bundles only the necessary files for production.
+  // Enabled for Render/Docker deployment, skipped in local dev.
+  output: process.env.NODE_ENV === "production" ? "standalone" : undefined,
 
   reactStrictMode: true,
   poweredByHeader: false,

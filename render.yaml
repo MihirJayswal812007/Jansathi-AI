@@ -1,20 +1,37 @@
+# ══════════════════════════════════════════════════════════════
+# JanSathi AI — Render Blueprint
+# ══════════════════════════════════════════════════════════════
+# This file defines the infrastructure for deploying both the
+# backend (Express + Prisma) and frontend (Next.js) on Render.
+#
+# Usage:
+#   1. Go to https://dashboard.render.com/blueprints
+#   2. Click "New Blueprint Instance"
+#   3. Connect your GitHub repo
+#   4. Fill in the prompted environment variables
+#   5. Click "Apply"
+# ══════════════════════════════════════════════════════════════
+
 services:
-  # ── Backend Service ──────────────────────────────────────────
+  # ── Backend (Express + Prisma + TypeScript) ────────────────
   - type: web
     name: jansathi-backend
     plan: free
-    env: node
+    runtime: node
     rootDir: backend
-    # Install dependencies, generate Prisma client, and compile TypeScript
-    buildCommand: npm install --include=dev && npm run build
-    # Start the compiled Express server
-    startCommand: npm start
+    region: singapore
+
+    # Build: install ALL deps, generate Prisma client, compile TS.
+    # We use explicit ./node_modules/.bin paths because Render's sh
+    # sometimes fails to resolve npx binaries (Permission denied).
+    buildCommand: "npm install && node ./node_modules/.bin/prisma generate && ./node_modules/.bin/tsc"
+    startCommand: node dist/index.js
+
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
-      # These will be prompted in the Render dashboard during setup:
       - key: DATABASE_URL
         sync: false
       - key: DIRECT_URL
@@ -23,26 +40,24 @@ services:
         sync: false
       - key: ADMIN_SECRET
         sync: false
-      # Automatically allow the frontend domain once deployed
       - key: ALLOWED_ORIGINS
         value: "https://jansathi-frontend.onrender.com"
 
-  # ── Frontend Service ─────────────────────────────────────────
+  # ── Frontend (Next.js) ─────────────────────────────────────
   - type: web
     name: jansathi-frontend
     plan: free
-    env: node
+    runtime: node
     rootDir: frontend
-    # Install dependencies and build Next.js for production
-    buildCommand: npm install --include=dev && npm run build
-    # Start the Next.js production server
+    region: singapore
+
+    buildCommand: npm install && npm run build
     startCommand: npm start
+
     envVars:
       - key: NODE_ENV
         value: production
-      # Automatically point to the backend domain once deployed
       - key: NEXT_PUBLIC_API_URL
         value: "https://jansathi-backend.onrender.com"
-      # This will be prompted in the Render dashboard
       - key: NEXT_PUBLIC_ADMIN_SECRET
         sync: false
