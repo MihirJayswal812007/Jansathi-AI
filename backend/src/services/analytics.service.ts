@@ -79,12 +79,11 @@ export async function getDashboardStats(): Promise<{
             _avg: { satisfaction: true },
         }),
         prisma.conversation.count({ where: { resolved: true } }),
-        prisma.analyticsEvent.groupBy({
-            by: ["metadata"],
+        prisma.analyticsEvent.findMany({
             where: { type: "message_sent" },
-            _count: true,
-            orderBy: { _count: { metadata: "desc" } },
-            take: 10,
+            select: { metadata: true },
+            orderBy: { timestamp: "desc" },
+            take: 1000,
         }),
         prisma.analyticsEvent.findMany({
             where: { timestamp: { gte: sevenDaysAgo } },
@@ -100,11 +99,16 @@ export async function getDashboardStats(): Promise<{
         moduleUsage[m.mode] = m._count.mode;
     }
 
-    const topIntents = topIntentsRaw.map((item: any) => {
-        const meta = item.metadata as { intent?: string } | null;
-        const count = typeof item._count === "number" ? item._count : 0;
-        return { intent: meta?.intent || "unknown", count };
+    // Process top intents (in-memory to avoid JSON groupBy error in Postgres)
+    const intentCounts: Record<string, number> = {};
+    topIntentsRaw.forEach((event: any) => {
+        const intent = event.metadata?.intent || "unknown";
+        intentCounts[intent] = (intentCounts[intent] || 0) + 1;
     });
+    const topIntents = Object.entries(intentCounts)
+        .map(([intent, count]) => ({ intent, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
 
     // Daily active users over last 7 days
     const dailyActiveUsers: { date: string; count: number }[] = [];

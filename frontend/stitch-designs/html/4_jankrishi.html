@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JanKrishi Agri Advisor</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#059669", 
+                        "primary-hover": "#047857",
+                        "primary-soft": "#064e3b",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#0a0a1a", 
+                        "surface-dark": "#131326",
+                        "surface-border": "#1f2937",
+                        "text-main": "#e5e7eb",
+                        "text-muted": "#9ca3af",
+                        "accent-glow": "rgba(5, 150, 105, 0.15)"
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "sans-serif"],
+                        body: ["Space Grotesk", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        lg: "0.75rem",
+                        xl: "1rem",
+                        "2xl": "1.5rem",
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(5, 150, 105, 0.2)',
+                    },
+                    keyframes: {
+                        pulseRing: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0.5' },
+                            '100%': { transform: 'scale(2)', opacity: '0' },
+                        },
+                        breathing: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(5, 150, 105, 0.4)' },
+                            '50%': { boxShadow: '0 0 40px rgba(5, 150, 105, 0.7)' },
+                        }
+                    },
+                    animation: {
+                        'pulse-ring': 'pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
+                        'breathing': 'breathing 3s ease-in-out infinite',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(19, 19, 38, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card:hover {
+            border-color: #059669;
+            box-shadow: 0 0 15px rgba(5, 150, 105, 0.1);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .mic-button-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mic-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid #059669;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            animation: pulse-ring 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        .mic-ring:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+        .mic-ring:nth-child(3) {
+            animation-delay: 1.2s;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-text-main font-display min-h-screen overflow-hidden flex">
+<aside class="w-64 h-screen border-r border-surface-border bg-surface-dark/50 flex flex-col justify-between p-4 fixed left-0 top-0 z-20">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-3 px-2">
+<div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-soft flex items-center justify-center shadow-glow">
+<span class="material-symbols-outlined text-white text-2xl">eco</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-white text-lg font-bold tracking-tight">JanSathi AI</h1>
+<span class="text-xs text-primary font-medium tracking-wide uppercase">Rural Assistant</span>
+</div>
+</div>
+<nav class="flex flex-col gap-2 mt-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/20 text-primary border border-primary/20 transition-all" href="#">
+<span class="material-symbols-outlined fill-1">chat_bubble</span>
+<span class="font-medium text-sm">Chat</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-muted hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-muted hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-medium text-sm">History</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-muted hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-medium text-sm">Profile</span>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-2 border-t border-surface-border pt-4">
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-muted hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium text-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-muted hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-medium text-sm">Help</span>
+</a>
+<div class="mt-2 flex items-center gap-3 px-3 py-3 bg-white/5 rounded-lg">
+<div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500" data-alt="User Avatar Placeholder"></div>
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-white">Ravi Kumar</span>
+<span class="text-[10px] text-text-muted">Pro Plan</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 ml-64 h-screen flex flex-col relative bg-background-dark bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0f2a22] to-background-dark">
+<header class="flex items-center justify-between px-8 py-5 border-b border-surface-border bg-background-dark/80 backdrop-blur-md z-10">
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-white/10 text-text-muted hover:text-white transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+<span class="text-lg">🌾</span>
+<span class="text-sm font-semibold text-primary tracking-wide">JanKrishi — Agri Advisor</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center h-10 w-10 rounded-full hover:bg-white/10 text-text-muted transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500"></span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-8 pb-32 pt-8 flex flex-col items-center">
+<div class="w-full max-w-4xl mb-8 animate-fade-in-up">
+<div class="glass-card p-8 rounded-2xl flex flex-col md:flex-row items-center gap-8 shadow-glow relative overflow-hidden group">
+<div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/20 transition-all duration-700"></div>
+<div class="h-32 w-32 rounded-2xl bg-gradient-to-br from-primary/20 to-primary-soft/10 border border-primary/30 flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(5,150,105,0.15)]">
+<span class="text-6xl drop-shadow-lg filter">🌾</span>
+</div>
+<div class="flex flex-col text-center md:text-left z-10">
+<h2 class="text-4xl font-bold text-white mb-2 tracking-tight">JanKrishi</h2>
+<div class="inline-block px-3 py-1 rounded bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-3 w-fit mx-auto md:mx-0">
+                            AI Agri Advisor
+                        </div>
+<p class="text-text-muted text-lg font-light max-w-lg">
+                            Your personal assistant for <span class="text-primary-hover font-medium">crop diseases</span>, <span class="text-primary-hover font-medium">weather alerts</span> &amp; <span class="text-primary-hover font-medium">mandi prices</span>.
+                        </p>
+</div>
+</div>
+</div>
+<div class="w-full flex flex-col items-center justify-center mb-12 relative z-10">
+<div class="mic-button-wrapper h-32 w-32 mb-4">
+<div class="mic-ring"></div>
+<div class="mic-ring"></div>
+<div class="mic-ring"></div>
+<button class="h-24 w-24 rounded-full bg-primary hover:bg-primary-hover text-white flex items-center justify-center relative z-20 animate-breathing transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(5,150,105,0.6)] border-4 border-[#0a0a1a]">
+<span class="material-symbols-outlined text-4xl">mic</span>
+</button>
+</div>
+<p class="text-xl text-white font-medium tracking-wide">Ask about crops, weather, prices</p>
+</div>
+<div class="w-full max-w-4xl mb-10">
+<h3 class="text-sm uppercase tracking-wider text-text-muted font-semibold mb-4 px-1">Suggested Questions</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<button class="glass-card p-5 rounded-xl text-left group transition-all duration-300 hover:-translate-y-1">
+<div class="flex items-start justify-between mb-3">
+<div class="h-10 w-10 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl">pest_control</span>
+</div>
+<span class="material-symbols-outlined text-text-muted text-sm group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+<p class="text-white font-medium text-sm leading-snug group-hover:text-primary-hover transition-colors">
+                            "My wheat crop has yellow spots on leaves"
+                        </p>
+</button>
+<button class="glass-card p-5 rounded-xl text-left group transition-all duration-300 hover:-translate-y-1">
+<div class="flex items-start justify-between mb-3">
+<div class="h-10 w-10 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl">storefront</span>
+</div>
+<span class="material-symbols-outlined text-text-muted text-sm group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+<p class="text-white font-medium text-sm leading-snug group-hover:text-primary-hover transition-colors">
+                            "What is the price of wheat in the nearest mandi?"
+                        </p>
+</button>
+<button class="glass-card p-5 rounded-xl text-left group transition-all duration-300 hover:-translate-y-1">
+<div class="flex items-start justify-between mb-3">
+<div class="h-10 w-10 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl">cloudy</span>
+</div>
+<span class="material-symbols-outlined text-text-muted text-sm group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+<p class="text-white font-medium text-sm leading-snug group-hover:text-primary-hover transition-colors">
+                            "Will it rain this week in my area?"
+                        </p>
+</button>
+</div>
+</div>
+<div class="w-full max-w-4xl">
+<h3 class="text-sm uppercase tracking-wider text-text-muted font-semibold mb-4 px-1">Capabilities</h3>
+<div class="flex flex-wrap gap-3">
+<span class="px-4 py-2 rounded-full bg-surface-dark border border-white/10 text-text-muted text-sm hover:border-primary/50 hover:text-primary cursor-default transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">medical_services</span> Crop disease diagnosis
+                    </span>
+<span class="px-4 py-2 rounded-full bg-surface-dark border border-white/10 text-text-muted text-sm hover:border-primary/50 hover:text-primary cursor-default transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">currency_rupee</span> Real-time mandi prices
+                    </span>
+<span class="px-4 py-2 rounded-full bg-surface-dark border border-white/10 text-text-muted text-sm hover:border-primary/50 hover:text-primary cursor-default transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">thermostat</span> Weather forecasts
+                    </span>
+<span class="px-4 py-2 rounded-full bg-surface-dark border border-white/10 text-text-muted text-sm hover:border-primary/50 hover:text-primary cursor-default transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">grass</span> Soil health tips
+                    </span>
+<span class="px-4 py-2 rounded-full bg-surface-dark border border-white/10 text-text-muted text-sm hover:border-primary/50 hover:text-primary cursor-default transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">recycling</span> Organic farming advice
+                    </span>
+</div>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 w-full bg-background-dark/95 backdrop-blur-xl border-t border-surface-border p-6 flex justify-center z-20">
+<div class="w-full max-w-4xl relative">
+<div class="relative flex items-center">
+<input class="w-full bg-surface-dark border border-surface-border text-white placeholder-text-muted rounded-2xl py-4 pl-6 pr-32 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow text-lg shadow-lg" placeholder="Ask about crops, weather, prices..." type="text"/>
+<div class="absolute right-3 flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-white/10 text-text-muted hover:text-primary transition-colors" title="Voice Input">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/30 transition-all hover:scale-105" title="Send">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<p class="text-center text-xs text-text-muted mt-3">JanKrishi AI can make mistakes. Consider checking important information.</p>
+</div>
+</div>
+</main>
+
+</body></html>

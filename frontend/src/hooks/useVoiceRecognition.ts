@@ -39,6 +39,15 @@ export function useVoiceRecognition({
     const [isSupported, setIsSupported] = useState(false);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
 
+    // Store callbacks in refs to avoid re-triggering the effect
+    const onResultRef = useRef(onResult);
+    const onErrorRef = useRef(onError);
+
+    useEffect(() => {
+        onResultRef.current = onResult;
+        onErrorRef.current = onError;
+    }, [onResult, onError]);
+
     useEffect(() => {
         const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -65,7 +74,7 @@ export function useVoiceRecognition({
                 if (final) {
                     setTranscript(final);
                     setInterimTranscript("");
-                    onResult?.(final);
+                    onResultRef.current?.(final);
                 } else {
                     setInterimTranscript(interim);
                 }
@@ -73,7 +82,7 @@ export function useVoiceRecognition({
 
             recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
                 setIsListening(false);
-                onError?.(event.error);
+                onErrorRef.current?.(event.error);
             };
 
             recognition.onend = () => {
@@ -86,7 +95,7 @@ export function useVoiceRecognition({
         return () => {
             recognitionRef.current?.abort();
         };
-    }, [language, continuous, onResult, onError]);
+    }, [language, continuous]);
 
     // Update language on the fly
     useEffect(() => {
