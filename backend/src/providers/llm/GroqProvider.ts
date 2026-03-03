@@ -139,6 +139,16 @@ export class GroqProvider implements ILLMProvider {
             ...input.messages.slice(-VALIDATION.maxConversationHistory),
         ];
 
+        const expectsJSON = input.systemPrompt.includes("CRITICAL INSTRUCTION FOR QUIZZES")
+            && input.messages.some(m => m.content.toLowerCase().includes("quiz") || m.content.toLowerCase().includes("mcq"));
+
+        if (expectsJSON) {
+            messages.push({
+                role: "system",
+                content: "CRITICAL REMINDER: The user has asked for a quiz. You MUST respond with ONLY the quiz in the exact format shown in the original instructions: two lines of ---QUIZ_JSON--- surrounding a single-line JSON object. No markdown, no conversation, no code blocks. Just the markers and the JSON."
+            });
+        }
+
         try {
             const stream = await this.client.chat.completions.create({
                 model: LLM.model,

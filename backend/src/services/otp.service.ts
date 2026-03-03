@@ -6,6 +6,7 @@ import { createHash, randomInt } from "crypto";
 import prisma from "../models/prisma";
 import { OTP } from "../config/env";
 import logger from "../utils/logger";
+import { trackOTPFailure } from "../middleware/abuseDetector";
 
 // ── Types ───────────────────────────────────────────────────
 export interface OTPRequestResult {
@@ -157,6 +158,7 @@ class OTPService {
         // Compare hashes (constant-time not critical for OTP but hash makes raw comparison safe)
         const inputHash = hashOTP(code);
         if (inputHash !== otpRecord.otpHash) {
+            trackOTPFailure(normalized);
             logger.warn("otp.incorrect", {
                 identifier: this.maskIdentifier(normalized),
                 attempt: otpRecord.attempts + 1,

@@ -1,6 +1,8 @@
 // ===== JanSathi AI — Not Found Page =====
 // Custom 404 page. Uses glassmorphism design system.
 
+"use client";
+
 import Link from "next/link";
 
 export default function NotFound() {
@@ -34,21 +36,25 @@ export default function NotFound() {
                 <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: "24px" }}>
                     This page doesn&apos;t exist. It may have been moved or deleted.
                 </p>
-                <Link
-                    href="/"
+                <button
+                    onClick={() => window.history.back()}
                     style={{
-                        display: "inline-block",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
                         padding: "10px 24px",
                         borderRadius: "12px",
                         background: "linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)",
                         color: "white",
                         fontWeight: 600,
                         fontSize: "0.875rem",
-                        textDecoration: "none",
+                        border: "none",
+                        cursor: "pointer",
                     }}
                 >
-                    ← Go Home
-                </Link>
+                    <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>arrow_back</span>
+                    Go Back
+                </button>
             </div>
         </div>
     );

@@ -1,6 +1,7 @@
 // ===== JanSathi AI — Mode Selector V2 (Stitch Bento Grid) =====
 // Bento-box layout: first two cards span 3 cols, bottom three span 2 cols
 // Glassmorphic cards with color-coded left borders · Material Symbols icons
+// Enhanced with 21st.dev GlowingEffect for interactive border glow
 
 "use client";
 
@@ -9,6 +10,7 @@ import { motion } from "framer-motion";
 import { ModeName } from "@/types/modules";
 import { MODE_CONFIGS, ALL_MODES } from "@/lib/constants";
 import { useModeStore } from "@/store/modeStore";
+import { GlowingEffect } from "@/components/ui/glowing-effect";
 
 // Material Symbols icon mapping per module
 const MODE_MATERIAL_ICONS: Record<ModeName, string> = {
@@ -89,7 +91,7 @@ export default function ModeSelector({ onModeSelect }: ModeSelectorProps) {
                         data-mode={modeId}
                         onClick={() => handleSelect(modeId)}
                         onKeyDown={(e) => handleKeyDown(e, index)}
-                        className={`mode-card ${isActive ? "active" : ""}`}
+                        className={`mode-card relative ${isActive ? "active" : ""}`}
                         style={
                             isActive
                                 ? {
@@ -108,9 +110,19 @@ export default function ModeSelector({ onModeSelect }: ModeSelectorProps) {
                         aria-label={`${language === "hi" ? config.nameHi : config.name}: ${language === "hi" ? config.taglineHi : config.tagline}`}
                         tabIndex={isActive || (!activeMode && index === 0) ? 0 : -1}
                     >
+                        {/* 21st.dev Glowing Effect — mouse-tracking border glow */}
+                        <GlowingEffect
+                            spread={40}
+                            glow
+                            disabled={false}
+                            proximity={64}
+                            inactiveZone={0.01}
+                            borderWidth={3}
+                        />
+
                         {/* Icon with module-colored background */}
                         <div
-                            className="mode-icon-wrap"
+                            className="mode-icon-wrap relative z-10"
                             style={{
                                 background: `${config.primaryColor}20`,
                             }}
@@ -129,14 +141,14 @@ export default function ModeSelector({ onModeSelect }: ModeSelectorProps) {
 
                         {/* Name */}
                         <span
-                            className="mode-name"
+                            className="mode-name relative z-10"
                             style={isActive ? { color: config.primaryColor } : undefined}
                         >
                             {language === "hi" ? config.nameHi : config.name}
                         </span>
 
                         {/* Tagline */}
-                        <span className="mode-tagline">
+                        <span className="mode-tagline relative z-10">
                             {language === "hi" ? config.taglineHi : config.tagline}
                         </span>
                     </motion.button>

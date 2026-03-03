@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JanKaushal Skill Udaan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#DC2626", // Red accent
+                        "primary-dark": "#B91C1C",
+                        "primary-light": "#EF4444",
+                        "background-dark": "#0a0a1a", // Deep dark blue/black
+                        "surface-dark": "#15152a",
+                        "surface-highlight": "#1e1e36",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "sans-serif"],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-dark text-slate-200 font-display min-h-screen flex overflow-hidden">
+<aside class="w-64 flex flex-col border-r border-white/10 bg-[#0d0d21] hidden md:flex h-screen shrink-0">
+<div class="p-6 border-b border-white/5">
+<div class="flex items-center gap-3">
+<div class="relative w-12 h-12 rounded-full overflow-hidden border border-white/10 shrink-0">
+<img alt="Confident man profile picture" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa-NZX4La22oOF4QUYHPCk-CcaXb9L7G2q-U1duVKFy_mzNLvNg101jkJG82WMTlcZjWrHJ2CKz47tthmoy5jZhtQky7o_BOGz2KVkLYGTGEdWGzesx-YFjM0b5dCYkI3pdYM251lPL_jlSsqk6-FQaZg1GZfkRjt8DOl_BEu9d2AIbAUv1YFODyLh1lD2WQHegkDWVI1No39sqFmd-pFv9H4BXfGStp62ey6Ibd0uplkfgG7AbBgT96tKV9bI6V4oumogu5TSbGM"/>
+</div>
+<div class="flex flex-col">
+<h1 class="text-white text-lg font-bold leading-tight tracking-tight">JanSathi</h1>
+<p class="text-slate-400 text-xs font-medium">AI Assistant</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 text-white group transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">chat_bubble</span>
+<span class="font-medium">Chat</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">history</span>
+<span class="font-medium">History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">account_circle</span>
+<span class="font-medium">Profile</span>
+</a>
+</nav>
+<div class="p-4 border-t border-white/5 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">help</span>
+<span class="font-medium">Help</span>
+</a>
+</div>
+</aside>
+<main class="flex-1 flex flex-col relative h-screen overflow-hidden bg-gradient-to-br from-background-dark via-[#101026] to-[#1a0f12]">
+<header class="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-background-dark/50 backdrop-blur-md z-10">
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-white/10 text-slate-300 transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+<span class="text-lg">🚀</span>
+<span class="text-sm font-semibold text-primary-light tracking-wide uppercase">JanKaushal — Skill Udaan</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-white/10 text-slate-300 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary"></span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-4 md:px-10 py-8 scrollbar-hide pb-32">
+<div class="max-w-4xl mx-auto flex flex-col items-center">
+<div class="relative w-full mb-8 flex flex-col items-center text-center">
+<div class="relative group cursor-pointer mb-6">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary to-orange-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+<div class="relative w-24 h-24 bg-surface-dark border border-white/10 rounded-full flex items-center justify-center shadow-2xl">
+<span class="material-symbols-outlined text-6xl text-primary drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">rocket_launch</span>
+</div>
+</div>
+<h1 class="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">
+                    JanKaushal
+                </h1>
+<h2 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-light to-orange-400 mb-4">
+                    Skill Udaan
+                </h2>
+<p class="text-lg text-slate-400 max-w-lg font-light">
+                    Jobs, resume builder &amp; career guidance for a brighter future.
+                </p>
+</div>
+<div class="w-full flex flex-col items-center justify-center my-8 md:my-10 relative z-20">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-[180px] h-[180px] rounded-full border border-primary/20 animate-ping-slow"></div>
+<div class="absolute w-[140px] h-[140px] rounded-full border border-primary/40 animate-pulse-slow"></div>
+<div class="absolute w-[120px] h-[120px] rounded-full bg-primary/10 blur-xl animate-pulse"></div>
+<button class="relative w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary-dark shadow-[0_0_40px_rgba(220,38,38,0.6)] hover:shadow-[0_0_60px_rgba(220,38,38,0.8)] border-4 border-surface-dark flex items-center justify-center transition-all duration-300 transform hover:scale-105 group z-10">
+<span class="material-symbols-outlined text-white text-5xl group-hover:animate-pulse">mic</span>
+</button>
+</div>
+<p class="mt-6 text-xl md:text-2xl font-medium text-slate-200 tracking-wide">
+                    Ask about jobs, skills, career
+                </p>
+</div>
+<div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+<button class="group relative flex flex-col items-start p-5 h-full bg-white/5 hover:bg-white/[0.07] border border-white/10 hover:border-primary/50 rounded-2xl transition-all duration-300 text-left backdrop-blur-sm overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<span class="material-symbols-outlined text-primary -rotate-45">arrow_forward</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-primary text-xl">description</span>
+</div>
+<span class="text-slate-200 font-medium text-lg leading-snug">Help me create a resume</span>
+</button>
+<button class="group relative flex flex-col items-start p-5 h-full bg-white/5 hover:bg-white/[0.07] border border-white/10 hover:border-primary/50 rounded-2xl transition-all duration-300 text-left backdrop-blur-sm overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<span class="material-symbols-outlined text-primary -rotate-45">arrow_forward</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-primary text-xl">near_me</span>
+</div>
+<span class="text-slate-200 font-medium text-lg leading-snug">What jobs are available near me?</span>
+</button>
+<button class="group relative flex flex-col items-start p-5 h-full bg-white/5 hover:bg-white/[0.07] border border-white/10 hover:border-primary/50 rounded-2xl transition-all duration-300 text-left backdrop-blur-sm overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<span class="material-symbols-outlined text-primary -rotate-45">arrow_forward</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-primary text-xl">school</span>
+</div>
+<span class="text-slate-200 font-medium text-lg leading-snug">Mock interview questions for a driver job</span>
+</button>
+</div>
+<div class="w-full mb-10">
+<h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4 text-center md:text-left">Capabilities</h3>
+<div class="flex flex-wrap justify-center md:justify-start gap-3">
+<div class="px-4 py-2 rounded-full bg-surface-highlight border border-white/10 hover:border-primary/40 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">badge</span>
+<span class="text-sm font-medium">Resume builder</span>
+</div>
+<div class="px-4 py-2 rounded-full bg-surface-highlight border border-white/10 hover:border-primary/40 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">work</span>
+<span class="text-sm font-medium">Job search</span>
+</div>
+<div class="px-4 py-2 rounded-full bg-surface-highlight border border-white/10 hover:border-primary/40 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">voice_chat</span>
+<span class="text-sm font-medium">Mock interviews</span>
+</div>
+<div class="px-4 py-2 rounded-full bg-surface-highlight border border-white/10 hover:border-primary/40 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">quiz</span>
+<span class="text-sm font-medium">Skill assessment</span>
+</div>
+<div class="px-4 py-2 rounded-full bg-surface-highlight border border-white/10 hover:border-primary/40 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">lightbulb</span>
+<span class="text-sm font-medium">Career guidance</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-4 md:p-6 bg-gradient-to-t from-background-dark via-background-dark to-transparent z-20">
+<div class="max-w-4xl mx-auto relative">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-orange-500/20 rounded-2xl blur-lg opacity-20"></div>
+<div class="relative bg-surface-dark border border-white/10 rounded-2xl p-2 flex items-center shadow-xl">
+<button class="p-3 text-slate-400 hover:text-white transition-colors rounded-xl hover:bg-white/5">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 px-4 text-lg h-12" placeholder="Ask about jobs, skills, career..." type="text"/>
+<button class="p-3 text-slate-400 hover:text-white transition-colors rounded-xl hover:bg-white/5 mr-1">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="p-3 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors shadow-lg shadow-primary/30 flex items-center justify-center">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<div class="text-center mt-3">
+<p class="text-xs text-slate-600">JanSathi may display inaccurate info, please double-check critical details.</p>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

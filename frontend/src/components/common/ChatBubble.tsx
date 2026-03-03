@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { ChatMessage } from "@/types/modules";
 import { MODE_CONFIGS } from "@/lib/constants";
 import { cleanTextForTTS } from "@/lib/cleanTextForTTS";
+import QuizCard, { QuizData } from "../chat/QuizCard";
 
 interface ChatBubbleProps {
     message: ChatMessage;
@@ -26,6 +27,89 @@ export default function ChatBubble({
 }: ChatBubbleProps) {
     const isUser = message.role === "user";
     const modeConfig = message.mode ? MODE_CONFIGS[message.mode] : null;
+
+    let parsedQuiz: QuizData | null = null;
+    let displayText = message.content;
+
+    // ── Quiz Detection ──────────────────────────────────────────────
+    // Handle all possible formats the LLM might output:
+    // 1. ---QUIZ_JSON--- markers (preferred)
+    // 2. Markdown ```json blocks
+    // 3. <QUIZ>...</QUIZ> XML tags
+    // 4. HTML-escaped &lt;QUIZ&gt;...&lt;/QUIZ&gt; (happens when LLM escapes HTML)
+
+    if (!isUser && message.content.includes('"type": "quiz"')) {
+        let jsonString = "";
+        const raw = message.content;
+
+        // Strategy 1: ---QUIZ_JSON--- markers
+        const MARKER = "---QUIZ_JSON---";
+        if (raw.includes(MARKER)) {
+            const parts = raw.split(MARKER);
+            if (parts.length >= 3) {
+                jsonString = parts[1].trim();
+            } else if (parts.length === 2) {
+                displayText = parts[0].trim();
+            }
+        }
+
+        // Strategy 2: ```json / ``` markdown block
+        if (!jsonString) {
+            const mdMatch = raw.match(/```json\s*([\s\S]*?)```/i) || raw.match(/```\s*([\s\S]*?)```/);
+            if (mdMatch) jsonString = mdMatch[1].trim();
+        }
+
+        // Strategy 3: <QUIZ>...</QUIZ> raw tags
+        if (!jsonString && raw.includes("<QUIZ>")) {
+            const s = raw.indexOf("<QUIZ>") + 6;
+            const e = raw.lastIndexOf("</QUIZ>");
+            if (e > s) jsonString = raw.substring(s, e).trim();
+        }
+
+        // Strategy 4: HTML-escaped &lt;QUIZ&gt;...&lt;/QUIZ&gt;
+        if (!jsonString && raw.includes("&lt;QUIZ&gt;")) {
+            const s = raw.indexOf("&lt;QUIZ&gt;") + 12;
+            const e = raw.lastIndexOf("&lt;/QUIZ&gt;");
+            if (e > s) jsonString = raw.substring(s, e).trim();
+        }
+
+        // Strategy 5: fallback — grab the first { ... } that contains "type":"quiz"
+        if (!jsonString) {
+            const s = raw.indexOf("{");
+            const e = raw.lastIndexOf("}");
+            if (s !== -1 && e > s) jsonString = raw.substring(s, e + 1);
+        }
+
+        if (jsonString) {
+            try {
+                const jsonObj = JSON.parse(jsonString);
+                if (jsonObj && jsonObj.type === "quiz") {
+                    parsedQuiz = jsonObj as QuizData;
+                    // Clean up display text — remove everything from the first marker/tag onwards
+                    displayText = raw
+                        .replace(jsonString, "")
+                        .replace(/---QUIZ_JSON---/g, "")
+                        .replace(/```json/gi, "").replace(/```/g, "")
+                        .replace(/<\/?QUIZ>/g, "")
+                        .replace(/&lt;\/?QUIZ&gt;/g, "")
+                        .trim();
+                }
+            } catch {
+                // JSON is incomplete (still streaming) — hide raw payload, show nothing extra
+                const firstMarkerIdx = Math.min(
+                    raw.includes(MARKER) ? raw.indexOf(MARKER) : Infinity,
+                    raw.includes("```json") ? raw.indexOf("```json") : Infinity,
+                    raw.includes("<QUIZ>") ? raw.indexOf("<QUIZ>") : Infinity,
+                    raw.includes("&lt;QUIZ&gt;") ? raw.indexOf("&lt;QUIZ&gt;") : Infinity,
+                    raw.includes("{") ? raw.indexOf("{") : Infinity
+                );
+                if (firstMarkerIdx !== Infinity) {
+                    displayText = raw.substring(0, firstMarkerIdx).trim();
+                }
+            }
+        }
+    }
+
 
     const timeStr = message.timestamp
         ? new Date(message.timestamp).toLocaleTimeString(
@@ -111,16 +195,39 @@ export default function ChatBubble({
                             {timeStr}
                         </time>
                     )}
+                    {/* RAG indicator badge */}
+                    <span
+                        style={{
+                            marginLeft: "auto",
+                            fontSize: "0.65rem",
+                            fontWeight: 600,
+                            padding: "2px 8px",
+                            borderRadius: "var(--radius-full)",
+                            background: "#10B98115",
+                            color: "#10B981",
+                            border: "1px solid #10B98130",
+                            letterSpacing: "0.02em",
+                        }}
+                    >
+                        ✦ Grounded
+                    </span>
                 </div>
             )}
 
             {/* Message content */}
-            <p
-                className="whitespace-pre-wrap m-0"
-                style={{ fontSize: "1rem", lineHeight: 1.6 }}
-            >
-                {message.content}
-            </p>
+            {displayText && (
+                <p
+                    className="whitespace-pre-wrap m-0"
+                    style={{ fontSize: "1rem", lineHeight: 1.6 }}
+                >
+                    {displayText}
+                </p>
+            )}
+
+            {/* Render Interactive Quiz Component if detected */}
+            {parsedQuiz && (
+                <QuizCard data={parsedQuiz} primaryColor={modeConfig?.primaryColor} />
+            )}
 
             {/* Footer: user timestamp + assistant speak button */}
             <div

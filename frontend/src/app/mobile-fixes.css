@@ -1,0 +1,186 @@
+/* ══════════════════════════════════════════════════════════════
+   JANSATHI AI — MOBILE RESPONSIVENESS FIXES
+   Supplemental breakpoints for pages that use custom CSS classes.
+   These rules extend the existing media queries without overriding
+   desktop layouts.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Dashboard ──────────────────────────────────────────────── */
+@media (max-width: 767px) {
+    .dashboard-v2-header {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .dashboard-v2-title {
+        font-size: 1rem;
+    }
+
+    .dashboard-v2-subtitle {
+        font-size: 0.7rem;
+    }
+
+    .dashboard-v2-content {
+        padding: 14px 14px 20px;
+        gap: 12px;
+    }
+
+    .dashboard-v2-footer {
+        font-size: 0.7rem;
+        padding: 10px 14px 80px;
+        /* extra bottom for mobile nav */
+    }
+}
+
+/* ── Settings Page ──────────────────────────────────────────── */
+/*
+  Settings rows use Tailwind's "flex items-center justify-between".
+  On very small screens (< 480px), the label + segmented buttons
+  don't fit in one row — fix by stacking them.
+*/
+@media (max-width: 479px) {
+
+    /* Stack each setting row vertically */
+    .settings-row-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+
+    /* Full-width segment controls on mobile */
+    .settings-segment {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}
+
+/* ── Profile Page ───────────────────────────────────────────── */
+@media (max-width: 479px) {
+
+    /* Profile header: avatar + info stacks vertically on tiny screens */
+    .profile-header-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 14px;
+    }
+
+    .profile-avatar {
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 1.25rem !important;
+    }
+}
+
+/* ── Admin Pages ────────────────────────────────────────────── */
+@media (max-width: 767px) {
+
+    /* Admin table: hide less important columns, compact cells */
+    .admin-table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 8px 10px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    /* Admin page header button row — stack on mobile */
+    .admin-header-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+/* ── History Page Detail Slide-over ─────────────────────────── */
+@media (max-width: 479px) {
+
+    /* Slide-over takes full width on small phones */
+    .history-slideover {
+        max-width: 100% !important;
+        border-left: none !important;
+    }
+}
+
+/* ── Landing Page nav — hide "Sign In" on very small phones ─── */
+@media (max-width: 400px) {
+    .landing-nav-signin {
+        display: none;
+    }
+
+    .landing-nav-inner {
+        padding: 10px 12px;
+    }
+}
+
+/* ── General safe-area & viewport fixes ─────────────────────── */
+@media (max-width: 767px) {
+
+    /* Ensure page content never gets obscured by mobile bottom nav */
+    .page-content-mobile-pad {
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Prevent horizontal overflow on any page */
+    body,
+    html {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    /* Fix toast z-index on mobile (bottom nav is z-50) */
+    .voice-error-toast {
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+        z-index: 9999;
+    }
+}
+
+/* ── Typography scaling for tiny screens ────────────────────── */
+@media (max-width: 360px) {
+    :root {
+        font-size: 14px;
+        /* Scale all rem-based sizes down slightly */
+    }
+
+    .gp-title {
+        font-size: 1.15rem;
+    }
+
+    .gp-subtitle {
+        font-size: 0.82rem;
+    }
+
+    .dashboard-v2-content {
+        padding: 10px 10px 20px;
+    }
+}
+
+/* ── Fix: Settings inline rows on < 640px ───────────────────── */
+/*
+  The settings items use Tailwind flex justify-between.
+  On phones < 540px, the segmented buttons push into label space.
+  We target specific inner structure via :has() / fallback class.
+*/
+@media (max-width: 540px) {
+
+    /* Make the settings option row wrap on small screens */
+    .settings-item-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .settings-item-row>div:first-child {
+        flex: 1 1 100%;
+        /* Label takes full width, controls drop below */
+        min-width: 0;
+    }
+
+    .settings-item-row>div:last-child,
+    .settings-item-row>button:last-child {
+        align-self: flex-start;
+    }
+}

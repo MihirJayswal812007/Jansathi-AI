@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import ClientShell from "@/components/common/ClientShell";
+import "./mobile-fixes.css";
 
 export const metadata: Metadata = {
   title: "JanSathi AI — Your Digital Companion",
@@ -23,7 +23,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#0F172A",
+  themeColor: "#0A0A0F",
 };
 
 export default function RootLayout({
@@ -46,9 +46,12 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ClientShell>
+        <a href="#main-content" className="skip-to-content">
+          Skip to content
+        </a>
+        <main id="main-content">
           {children}
-        </ClientShell>
+        </main>
         <script
           dangerouslySetInnerHTML={{
             __html: `

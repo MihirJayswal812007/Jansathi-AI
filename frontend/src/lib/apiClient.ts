@@ -7,6 +7,23 @@ import { ChatMessage, ModeName } from "@/types/modules";
 // When empty (default), requests go to same-origin Next.js API routes.
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
+// ── CSRF Token Helper ───────────────────────────────────────
+
+/** Read the jansathi_csrf cookie so we can send it as x-csrf-token header. */
+function getCSRFToken(): string {
+    if (typeof document === "undefined") return "";
+    const match = document.cookie.match(/(?:^|;\s*)jansathi_csrf=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : "";
+}
+
+/** Build headers for state-changing requests (POST, PATCH, PUT, DELETE). */
+function mutationHeaders(): Record<string, string> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const csrf = getCSRFToken();
+    if (csrf) headers["x-csrf-token"] = csrf;
+    return headers;
+}
+
 // ── Chat API ────────────────────────────────────────────────
 
 interface ChatAPIRequest {
@@ -40,7 +57,7 @@ export async function sendChatMessage(
 
     const response = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: mutationHeaders(),
         credentials: "include",
         body: JSON.stringify({
             message,
@@ -65,7 +82,7 @@ export async function submitFeedback(
 ): Promise<{ success: boolean }> {
     const res = await fetch(`${API_BASE}/api/chat/${conversationId}/feedback`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: mutationHeaders(),
         credentials: "include",
         body: JSON.stringify({ satisfaction }),
     });
@@ -231,7 +248,7 @@ export async function updateProfile(
 ): Promise<UserProfile> {
     const res = await fetch(`${API_BASE}/api/user/profile`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: mutationHeaders(),
         credentials: "include",
         body: JSON.stringify(data),
     });
@@ -258,7 +275,7 @@ export async function updatePreferences(
 ): Promise<UserPreferences> {
     const res = await fetch(`${API_BASE}/api/user/preferences`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: mutationHeaders(),
         credentials: "include",
         body: JSON.stringify(data),
     });
@@ -370,4 +387,132 @@ export async function fetchAdminConversationDetail(id: string): Promise<Conversa
     const json = await res.json();
     if (!json.success) throw new Error(json.error?.message || "Failed to load conversation");
     return json.data;
+}
+
+// ── Admin User Management API ───────────────────────────────
+
+export interface AdminUser {
+    id: string;
+    phone: string | null;
+    email: string | null;
+    name: string | null;
+    role: string;
+    active: boolean;
+    language: string;
+    village: string | null;
+    district: string | null;
+    state: string | null;
+    lastActiveAt: string;
+    createdAt: string;
+    _count?: { conversations: number };
+}
+
+/** Fetch paginated list of all users (admin). */
+export async function fetchAdminUsers(
+    page = 1,
+    search?: string
+): Promise<{ data: AdminUser[]; pagination: { page: number; total: number; totalPages: number } }> {
+    const params = new URLSearchParams({ page: String(page) });
+    if (search) params.set("search", search);
+
+    const res = await fetch(`${API_BASE}/api/admin/users?${params}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Admin users error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || "Failed to load users");
+    return { data: json.data, pagination: json.pagination };
+}
+
+/** Change a user's role (admin). */
+export async function updateUserRole(
+    userId: string,
+    role: "user" | "admin"
+): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_BASE}/api/admin/users/${userId}/role`, {
+        method: "PATCH",
+        headers: mutationHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ role }),
+    });
+    if (!res.ok) throw new Error(`Role update error: ${res.status}`);
+    return res.json();
+}
+
+/** Toggle a user's active status (admin). */
+export async function toggleUserActive(
+    userId: string,
+    active: boolean
+): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_BASE}/api/admin/users/${userId}/active`, {
+        method: "PATCH",
+        headers: mutationHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ active }),
+    });
+    if (!res.ok) throw new Error(`Active toggle error: ${res.status}`);
+    return res.json();
+}
+
+// ── Mandi Prices API ────────────────────────────────────────
+
+export interface MandiResult {
+    crop: string;
+    entries: Array<{
+        state: string;
+        district: string;
+        market: string;
+        variety: string;
+        minPrice: number;
+        maxPrice: number;
+        modalPrice: number;
+    }>;
+}
+
+/** Fetch mandi prices by crop, state, or mandi name. */
+export async function fetchMandiPrices(
+    params: { crop?: string; state?: string; mandi?: string }
+): Promise<{ results: MandiResult | MandiResult[] | null; availableCrops?: string[] }> {
+    const searchParams = new URLSearchParams();
+    if (params.crop) searchParams.set("crop", params.crop);
+    if (params.state) searchParams.set("state", params.state);
+    if (params.mandi) searchParams.set("mandi", params.mandi);
+
+    const res = await fetch(`${API_BASE}/api/mandi?${searchParams}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Mandi API error: ${res.status}`);
+    const json = await res.json();
+    return { results: json.results || null, availableCrops: json.availableCrops };
+}
+
+// ── Weather API ─────────────────────────────────────────────
+
+export interface WeatherForecast {
+    current: { temp: number; humidity: number; description: string; icon: string };
+    daily: Array<{
+        date: string;
+        tempMin: number;
+        tempMax: number;
+        humidity: number;
+        description: string;
+        icon: string;
+    }>;
+}
+
+/** Fetch weather forecast by city name or coordinates. */
+export async function fetchWeather(
+    params: { city?: string; lat?: number; lng?: number }
+): Promise<{ city: string; forecast: WeatherForecast }> {
+    const searchParams = new URLSearchParams();
+    if (params.city) searchParams.set("city", params.city);
+    if (params.lat != null) searchParams.set("lat", String(params.lat));
+    if (params.lng != null) searchParams.set("lng", String(params.lng));
+
+    const res = await fetch(`${API_BASE}/api/weather?${searchParams}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Weather API error: ${res.status}`);
+    const json = await res.json();
+    return { city: json.city, forecast: json.forecast };
 }

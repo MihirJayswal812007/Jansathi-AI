@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JanSeva - JanSathi AI</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "primary-hover": "#1d4ed8",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0a1a",
+                        "surface-dark": "#111622",
+                        "glass": "rgba(255, 255, 255, 0.05)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                    animation: {
+                        'pulse-ring': 'pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
+                    },
+                    keyframes: {
+                        'pulse-ring': {
+                            '0%': { transform: 'scale(0.8)', opacity: '0.5' },
+                            '100%': { transform: 'scale(2.2)', opacity: '0' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Space Grotesk", sans-serif;
+        }
+        .glass-panel {
+            background: rgba(17, 22, 34, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .glass-card:hover {
+            background: rgba(36, 99, 235, 0.1);
+            border-color: rgba(36, 99, 235, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 min-h-screen flex overflow-hidden selection:bg-primary selection:text-white">
+<aside class="w-20 lg:w-64 flex-shrink-0 flex flex-col border-r border-slate-800 bg-[#0e121b] h-screen transition-all duration-300">
+<div class="h-16 flex items-center px-4 lg:px-6 border-b border-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="relative flex items-center justify-center size-8 rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+</div>
+<div class="hidden lg:flex flex-col">
+<h1 class="text-white text-base font-bold leading-none tracking-tight">JanSathi AI</h1>
+<span class="text-slate-500 text-xs mt-1">Gov Assist</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 p-3 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-white group transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+<span class="hidden lg:block text-sm font-medium">Chat</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 group transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span class="hidden lg:block text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 group transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="hidden lg:block text-sm font-medium">History</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 group transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+<span class="hidden lg:block text-sm font-medium">Profile</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 group transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="hidden lg:block text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-3 border-t border-slate-800/50">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 group transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="hidden lg:block text-sm font-medium">Help</span>
+</a>
+</div>
+</aside>
+<main class="flex-1 flex flex-col relative min-w-0">
+<header class="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-[#0a0a1a]/90 backdrop-blur-sm z-10 sticky top-0">
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50">
+<span class="text-lg">🏛️</span>
+<span class="text-sm font-semibold text-slate-200">JanSeva — Civic Connect</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="size-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-8 rounded-full bg-gradient-to-tr from-primary to-purple-500 p-[1px]">
+<div class="size-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="size-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzDNVyDUPFCT2GOHuNEPZkyn6yPPbOtqFOCxqnAVzKWcQFmPjFF5EOkDwSQYC8183ZyfqDj21pKZSztRyn88tUZHR2jygqEM4SeSpxqj6z3Dv0SrfpUmyhb3lazHJBT9gP2EYlEFVoEWMKCSyq5JMxRwhEXBC7TR6IHLLv0xYFiLw8wJKZuZ103gmRzZCcAepgO3vv_FYdC5uIMCERr95KVy6mhLJRisuawSpIcOe4ZbRoF54Lec8ntaIJRPoy9T443Bywm8sLxFo"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<div class="flex-1 flex flex-col relative">
+<div class="flex-1 flex flex-col items-center justify-center p-6 overflow-hidden">
+<div class="flex flex-col items-center justify-center relative z-10 animate-fade-in-up">
+<div class="relative flex items-center justify-center mb-8">
+<div class="absolute inset-0 bg-primary/20 rounded-full animate-pulse-ring" style="animation-delay: 0s;"></div>
+<div class="absolute inset-0 bg-primary/20 rounded-full animate-pulse-ring" style="animation-delay: 1s;"></div>
+<div class="absolute inset-0 bg-primary/20 rounded-full animate-pulse-ring" style="animation-delay: 2s;"></div>
+<button class="relative z-10 size-24 rounded-full bg-gradient-to-br from-primary to-blue-600 shadow-[0_0_40px_rgba(37,99,235,0.4)] flex items-center justify-center group hover:scale-105 transition-transform duration-300 border-4 border-[#0a0a1a]">
+<span class="material-symbols-outlined text-white text-4xl group-hover:animate-pulse">mic</span>
+</button>
+</div>
+<div class="text-center space-y-3 max-w-md mx-auto">
+<h2 class="text-2xl font-bold text-white tracking-tight">Tap to speak about government schemes</h2>
+<p class="text-slate-400 text-sm">JanSeva is listening. Try asking about "PM Kisan Samman Nidhi" or "Aadhaar update"</p>
+</div>
+</div>
+</div>
+<div class="p-6 pt-2">
+<div class="max-w-3xl mx-auto relative group">
+<div class="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-purple-600/50 rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
+<div class="relative flex items-center bg-[#131b2e] rounded-xl border border-slate-700 shadow-lg p-2 gap-2">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 focus:outline-none h-10 px-2 font-body text-base" placeholder="Ask about government schemes..." type="text"/>
+<div class="flex items-center gap-1 border-l border-slate-700 pl-2">
+<button class="p-2 text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="p-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<div class="text-center mt-3">
+<p class="text-[10px] text-slate-500">JanSathi AI may produce inaccurate information about people, places, or facts.</p>
+</div>
+</div>
+</div>
+</div>
+<aside class="w-[400px] border-l border-slate-800 bg-[#0d111c] hidden xl:flex flex-col overflow-y-auto">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-[#0d111c]"></div>
+<div class="absolute inset-0" style="background-image: radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.15) 0%, transparent 50%);"></div>
+<div class="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
+<div class="size-16 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 shadow-xl flex items-center justify-center mb-4 ring-1 ring-white/10">
+<span class="text-4xl filter drop-shadow-[0_0_8px_rgba(37,99,235,0.5)]">🏛️</span>
+</div>
+<h2 class="text-xl font-bold text-white tracking-tight">JanSeva</h2>
+<p class="text-primary font-medium text-sm">Civic Connect</p>
+</div>
+</div>
+<div class="px-6 pb-6 border-b border-slate-800/50">
+<p class="text-sm text-slate-300 text-center leading-relaxed">
+                        Your dedicated assistant for navigating government schemes, understanding documents, and accessing civic services seamlessly.
+                    </p>
+</div>
+<div class="p-6 flex-1">
+<h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">What I can help with</h3>
+<div class="space-y-3">
+<button class="w-full glass-card p-4 rounded-xl flex items-start gap-4 group text-left">
+<div class="p-2 rounded-lg bg-slate-800 text-slate-300 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">fact_check</span>
+</div>
+<div>
+<h4 class="text-sm font-semibold text-slate-200 group-hover:text-white">Check Eligibility</h4>
+<p class="text-xs text-slate-500 mt-1">Verify if you qualify for central &amp; state schemes.</p>
+</div>
+</button>
+<button class="w-full glass-card p-4 rounded-xl flex items-start gap-4 group text-left">
+<div class="p-2 rounded-lg bg-slate-800 text-slate-300 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">description</span>
+</div>
+<div>
+<h4 class="text-sm font-semibold text-slate-200 group-hover:text-white">Document Help</h4>
+<p class="text-xs text-slate-500 mt-1">Guidance for Aadhaar, PAN, Voter ID &amp; more.</p>
+</div>
+</button>
+<button class="w-full glass-card p-4 rounded-xl flex items-start gap-4 group text-left">
+<div class="p-2 rounded-lg bg-slate-800 text-slate-300 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">gavel</span>
+</div>
+<div>
+<h4 class="text-sm font-semibold text-slate-200 group-hover:text-white">File a Complaint</h4>
+<p class="text-xs text-slate-500 mt-1">Report civic issues directly to authorities.</p>
+</div>
+</button>
+<button class="w-full glass-card p-4 rounded-xl flex items-start gap-4 group text-left">
+<div class="p-2 rounded-lg bg-slate-800 text-slate-300 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">timeline</span>
+</div>
+<div>
+<h4 class="text-sm font-semibold text-slate-200 group-hover:text-white">Track Application</h4>
+<p class="text-xs text-slate-500 mt-1">Check the live status of your submissions.</p>
+</div>
+</button>
+</div>
+</div>
+<div class="p-6 mt-auto">
+<div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-4 border border-slate-700/50">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-yellow-500">lightbulb</span>
+<span class="text-xs font-bold text-white uppercase">Did you know?</span>
+</div>
+<p class="text-xs text-slate-400 leading-relaxed">
+                            You can upload a photo of a document to get it explained instantly.
+                        </p>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

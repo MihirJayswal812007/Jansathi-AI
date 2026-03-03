@@ -11,6 +11,8 @@ import {
     destroySession,
     clearSessionCookie,
 } from "../middleware/auth";
+import { rotateCSRFToken } from "../middleware/csrf";
+import { trackSessionCreation } from "../middleware/abuseDetector";
 import { otpService } from "../services/otp.service";
 import logger from "../utils/logger";
 
@@ -20,7 +22,7 @@ export const authRouter = Router();
 // don't consume the strict OTP budget.
 
 // POST /api/auth/session — Create or refresh session
-authRouter.post("/session", async (req: Request, res: Response) => {
+authRouter.post("/session", sessionCheckRateLimiter, async (req: Request, res: Response) => {
     const requestId = logger.generateRequestId();
 
     try {
@@ -38,6 +40,10 @@ authRouter.post("/session", async (req: Request, res: Response) => {
         // Create new session
         const session = await createSession(req);
         setSessionCookie(res, session.token);
+        rotateCSRFToken(res);
+
+        // Track for abuse detection
+        trackSessionCreation(req.ip || "unknown");
 
         logger.info("auth.session.created_via_route", { requestId, sessionId: session.id });
 

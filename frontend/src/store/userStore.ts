@@ -9,10 +9,13 @@ import type { SessionInfo } from "@/lib/apiClient";
 type Language = "hi" | "en";
 
 // ── Persisted slice — UI preferences only ────────────────────
+type FontSize = "small" | "normal" | "large";
+
 interface PersistedState {
     language: Language;
     voiceEnabled: boolean;
     soundEnabled: boolean;
+    fontSize: FontSize;
 }
 
 // ── Ephemeral slice — server-derived auth state ───────────────
@@ -30,6 +33,8 @@ interface Actions {
     setLanguage: (lang: Language) => void;
     toggleVoice: () => void;
     toggleSound: () => void;
+    setFontSize: (size: FontSize) => void;
+    setVoiceEnabled: (enabled: boolean) => void;
     // Auth actions
     setAuth: (user: SessionInfo) => void;
     clearAuth: () => void;
@@ -45,6 +50,7 @@ export const useUserStore = create<UserState>()(
             language: "hi",
             voiceEnabled: true,
             soundEnabled: true,
+            fontSize: "normal" as FontSize,
 
             // ── Ephemeral auth (reset on every page load) ────
             isAuthenticated: false,
@@ -56,6 +62,8 @@ export const useUserStore = create<UserState>()(
             setLanguage: (language) => set({ language }),
             toggleVoice: () => set((s) => ({ voiceEnabled: !s.voiceEnabled })),
             toggleSound: () => set((s) => ({ soundEnabled: !s.soundEnabled })),
+            setFontSize: (fontSize) => set({ fontSize }),
+            setVoiceEnabled: (voiceEnabled) => set({ voiceEnabled }),
 
             // ── Auth actions ──────────────────────────────────
             setAuth: (user) =>
@@ -82,6 +90,7 @@ export const useUserStore = create<UserState>()(
                 language: state.language,
                 voiceEnabled: state.voiceEnabled,
                 soundEnabled: state.soundEnabled,
+                fontSize: state.fontSize,
             }),
         }
     )

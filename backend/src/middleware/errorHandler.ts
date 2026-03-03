@@ -2,13 +2,14 @@
 
 import { Response } from "express";
 
-export type ErrorCode = "INVALID_INPUT" | "RATE_LIMITED" | "UNAUTHORIZED" | "FORBIDDEN" | "INTERNAL_ERROR" | "DB_ERROR";
+export type ErrorCode = "INVALID_INPUT" | "RATE_LIMITED" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "INTERNAL_ERROR" | "DB_ERROR";
 
 const ERROR_STATUS: Record<ErrorCode, number> = {
     INVALID_INPUT: 400,
     RATE_LIMITED: 429,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
+    NOT_FOUND: 404,
     INTERNAL_ERROR: 500,
     DB_ERROR: 500,
 };

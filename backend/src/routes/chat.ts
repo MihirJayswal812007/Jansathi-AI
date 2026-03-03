@@ -6,7 +6,7 @@ import { Router, Request, Response } from "express";
 import { rateLimitMiddleware } from "../middleware/rateLimiter";
 import { validateChatInput } from "../middleware/validator";
 import { sendError } from "../middleware/errorHandler";
-import { resolveSession, setSessionCookie } from "../middleware/auth";
+import { resolveSession, setSessionCookie, getSession } from "../middleware/auth";
 import { handleChat } from "../services/chat.service";
 import { endConversation } from "../services/conversation";
 import { type ChatRequest } from "../utils/types";
@@ -51,6 +51,13 @@ chatRouter.patch("/:id/feedback", async (req: Request, res: Response) => {
     const requestId = logger.generateRequestId();
 
     try {
+        // Require authenticated session with linked user
+        const session = await getSession(req);
+        const userId = session?.userId;
+        if (!userId) {
+            return sendError(res, "UNAUTHORIZED", "Authentication required", requestId);
+        }
+
         const { id } = req.params;
         const { satisfaction } = req.body || {};
 
@@ -62,7 +69,7 @@ chatRouter.patch("/:id/feedback", async (req: Request, res: Response) => {
             return sendError(res, "INVALID_INPUT", "Satisfaction must be an integer between 1 and 5", requestId);
         }
 
-        await endConversation(id, satisfaction);
+        await endConversation(id, satisfaction, userId);
 
         logger.info("chat.feedback.submitted", { requestId, conversationId: id, satisfaction });
 

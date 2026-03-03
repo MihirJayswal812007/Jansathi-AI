@@ -32,17 +32,19 @@ export class MemoryPruner {
             // Step 1: Age-based pruning (bulk, efficient)
             // Delete entries older than pruneDays, but protect recent ones
             if (this.config.pruneDays > 0) {
+                const cutoffDate = new Date(Date.now() - this.config.pruneDays * 24 * 60 * 60 * 1000);
                 const ageResult = await prisma.$executeRawUnsafe(
                     `DELETE FROM conversation_memory
-                     WHERE created_at < NOW() - INTERVAL '${this.config.pruneDays} days'
+                     WHERE created_at < $1
                      AND id NOT IN (
                          SELECT id FROM (
                              SELECT id, user_id,
                                     ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) AS rn
                              FROM conversation_memory
                          ) ranked
-                         WHERE rn <= $1
+                         WHERE rn <= $2
                      )`,
+                    cutoffDate,
                     this.config.protectedRecentCount
                 );
 

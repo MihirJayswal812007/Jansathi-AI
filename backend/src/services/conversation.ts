@@ -203,12 +203,16 @@ export async function addMessage(input: MessageCreateInput): Promise<string> {
 // ── Get Conversation History ────────────────────────────────
 export async function getConversationHistory(
     conversationId: string,
-    limit?: number
+    limit?: number,
+    userId?: string
 ): Promise<ConversationWithMessages | null> {
     const maxMessages = limit || VALIDATION.maxConversationHistory;
 
-    const conversation = await prisma.conversation.findUnique({
-        where: { id: conversationId },
+    const whereClause: { id: string; userId?: string } = { id: conversationId };
+    if (userId) whereClause.userId = userId;
+
+    const conversation = await prisma.conversation.findFirst({
+        where: whereClause,
         include: {
             messages: {
                 orderBy: { timestamp: "desc" },
@@ -255,10 +259,22 @@ export async function findActiveConversation(
 // ── End Conversation ────────────────────────────────────────
 export async function endConversation(
     conversationId: string,
-    satisfaction?: number
+    satisfaction?: number,
+    userId?: string
 ): Promise<void> {
     if (satisfaction !== undefined && (satisfaction < 1 || satisfaction > 5)) {
         throw new Error("Satisfaction must be between 1 and 5");
+    }
+
+    // Verify ownership if userId provided
+    if (userId) {
+        const conversation = await prisma.conversation.findFirst({
+            where: { id: conversationId, userId },
+            select: { id: true },
+        });
+        if (!conversation) {
+            throw new Error("Conversation not found");
+        }
     }
 
     await prisma.conversation.update({

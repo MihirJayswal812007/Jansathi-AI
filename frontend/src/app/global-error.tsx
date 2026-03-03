@@ -1,8 +1,7 @@
-// ===== JanSathi AI — Global Error Boundary =====
-// Last-resort error handler when root layout itself crashes.
-// Cannot use layout.tsx styles — renders minimal standalone HTML.
-
 "use client";
+
+// Minimal global error boundary — must include <html> and <body>.
+// Kept intentionally simple to avoid SSR prerender issues.
 
 export default function GlobalError({
     error,
@@ -20,7 +19,7 @@ export default function GlobalError({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "#0A0F1C",
+                    background: "#0A0A0F",
                     color: "#E2E8F0",
                     fontFamily: "system-ui, sans-serif",
                     padding: "24px",
@@ -34,13 +33,8 @@ export default function GlobalError({
                     <p style={{ color: "#94A3B8", fontSize: "0.875rem", marginBottom: "24px" }}>
                         The application encountered a critical error and needs to reload.
                     </p>
-                    {error.digest && (
-                        <p style={{ color: "#64748B", fontSize: "0.7rem", marginBottom: "16px", fontFamily: "monospace" }}>
-                            Digest: {error.digest}
-                        </p>
-                    )}
                     <button
-                        onClick={reset}
+                        onClick={() => reset()}
                         style={{
                             padding: "12px 24px",
                             borderRadius: "12px",
