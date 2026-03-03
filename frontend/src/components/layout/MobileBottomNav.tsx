@@ -13,6 +13,7 @@ const TABS = [
     { href: "/history", label: "History", labelHi: "इतिहास", icon: "history", auth: true },
     { href: "/dashboard", label: "Dashboard", labelHi: "डैशबोर्ड", icon: "dashboard", admin: true },
     { href: "/profile", label: "Profile", labelHi: "प्रोफ़ाइल", icon: "person", auth: true },
+    { href: "/login", label: "Login", labelHi: "लॉगिन", icon: "login", guest: true },
 ] as const;
 
 export default function MobileBottomNav() {
@@ -23,6 +24,7 @@ export default function MobileBottomNav() {
     const visibleTabs = TABS.filter((tab) => {
         if ("admin" in tab && tab.admin) return isAuthenticated && isAdmin;
         if ("auth" in tab && tab.auth) return isAuthenticated;
+        if ("guest" in tab && tab.guest) return !isAuthenticated;
         return true;
     });
 

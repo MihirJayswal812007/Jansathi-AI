@@ -31,25 +31,25 @@ const PIPELINE_STEPS = [
 ];
 
 const INTEL_CARDS = [
-  { icon: "library_books", title: "Static Knowledge (RAG)", desc: "1,500+ government scheme documents indexed with pgvector semantic search. Every answer is grounded in verified data.", color: "var(--intel-rag)" },
+  { icon: "library_books", title: "Static Knowledge (RAG)", desc: "Curated government scheme knowledge base with pgvector semantic search. Every answer is grounded in verified, structured scheme data.", color: "var(--intel-rag)" },
   { icon: "psychology", title: "Conversation Memory", desc: "Your past interactions inform future responses. The AI remembers your context, eligibility, and preferences.", color: "var(--intel-memory)" },
   { icon: "person_search", title: "Long-term Profile", desc: "LLM-generated user profiles summarize your patterns over time for deeply personalized guidance.", color: "var(--intel-profile)" },
   { icon: "swap_vert", title: "Smart Reranking", desc: "Cross-encoder reranking ensures the most relevant documents surface first, not just the highest similarity.", color: "var(--intel-reranker)" },
 ];
 
 const FEATURES = [
-  { icon: "translate", title: "Multilingual", desc: "Hindi & English with Devanagari-optimized tokenization" },
-  { icon: "mic", title: "Voice-First", desc: "Speak naturally — the AI understands spoken Hindi" },
+  { icon: "translate", title: "Multilingual", desc: "Hindi & English with Devanagari-aware tokenization for natural conversations" },
+  { icon: "mic", title: "Voice-First", desc: "Speak naturally — the AI understands spoken Hindi and English" },
   { icon: "verified_user", title: "Secure OTP Auth", desc: "Phone-based authentication, no passwords to remember" },
   { icon: "speed", title: "Redis Scaling", desc: "Rate limiting and caching for production-grade performance" },
   { icon: "analytics", title: "Built-in Analytics", desc: "Usage tracking, token budgets, and retrieval metrics" },
-  { icon: "memory", title: "Embedding Cache", desc: "LRU+TTL cache reduces API costs by 50% on repeated queries" },
+  { icon: "memory", title: "Embedding Cache", desc: "LRU+TTL cache avoids redundant embedding API calls on repeated queries" },
 ];
 
 const STATS = [
-  { value: "1,500+", label: "Schemes Indexed" },
-  { value: "200+", label: "Automated Tests" },
-  { value: "5", label: "AI Intelligence Layers" },
+  { value: "6", label: "Core Schemes Covered" },
+  { value: "230+", label: "Automated Tests" },
+  { value: "4", label: "AI Intelligence Layers" },
   { value: "<2s", label: "Avg Response Time" },
 ];
 
@@ -156,7 +156,7 @@ export default function LandingPage() {
           <motion.div className="landing-problem-grid" custom={1} variants={fadeUp}>
             {[
               { value: "70%", label: "of eligible citizens unaware of applicable schemes", icon: "visibility_off" },
-              { value: "22+", label: "official languages — most portals only support Hindi/English", icon: "translate" },
+              { value: "3+", label: "office visits on average to complete a single scheme application", icon: "location_away" },
               { value: "45min", label: "average time to navigate a government portal", icon: "schedule" },
             ].map((item) => (
               <div key={item.label} className="landing-problem-card">
@@ -227,7 +227,7 @@ export default function LandingPage() {
             <h2 className="landing-section-title font-display">
               Four Layers of Context.
               <br />
-              <span style={{ color: "var(--intel-memory)" }}>One Intelligent Response.</span>
+              <span style={{ color: "var(--intel-memory)" }}>One Intelligent Answer.</span>
             </h2>
             <p className="landing-section-desc">
               Every response is grounded in verified documents, enriched with your conversation history,
@@ -304,8 +304,8 @@ export default function LandingPage() {
             {[
               { icon: "shield", title: "User-Isolated Memory", desc: "Every user's conversation memory and profile is completely isolated. No cross-user data leakage — ever." },
               { icon: "lock", title: "OTP-Only Authentication", desc: "No passwords to steal. Phone-based OTP with rate limiting, brute-force protection, and session cookies." },
-              { icon: "key", title: "No Secrets in Code", desc: "All credentials are environment-injected at runtime. Git history cleaned. Gitleaks CI scanning active." },
-              { icon: "speed", title: "Rate-Limited by Design", desc: "Redis-backed rate limiting with per-user quotas. Automatic scaling. Memory fallback for zero-downtime." },
+              { icon: "key", title: "No Secrets in Code", desc: "All credentials are environment-injected at runtime. No hardcoded secrets in the repository." },
+              { icon: "speed", title: "Rate-Limited by Design", desc: "Redis-backed rate limiting with per-user quotas. Memory fallback ensures zero-downtime." },
             ].map((item, i) => (
               <motion.div key={item.title} className="landing-trust-card" custom={i + 2} variants={fadeUp}>
                 <span className="material-symbols-outlined" style={{ color: "var(--janseva-primary)", fontSize: 24 }}>
@@ -354,7 +354,7 @@ export default function LandingPage() {
               © 2026 JanSathi AI · Built with ❤️ for Bharat
             </span>
             <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
-              201 automated tests · Production-grade architecture
+              230+ automated tests · Production-grade architecture
             </span>
           </div>
         </div>

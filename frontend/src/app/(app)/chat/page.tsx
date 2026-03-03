@@ -83,6 +83,9 @@ export default function ChatPage() {
     // Pending transcript for welcome screen auto-routing
     const pendingTranscriptRef = useRef<string | null>(null);
 
+    // Voice error state for user feedback
+    const [voiceError, setVoiceError] = useState<string | null>(null);
+
     // Voice recognition — uses the hook's own isListening & interimTranscript
     const {
         isListening,
@@ -93,6 +96,7 @@ export default function ChatPage() {
         language,
         onResult: (transcript) => {
             if (transcript.trim()) {
+                setVoiceError(null);
                 if (!activeMode) {
                     // On welcome screen — detect module and send message after routing
                     const detected = detectModule(transcript);
@@ -104,8 +108,11 @@ export default function ChatPage() {
                 }
             }
         },
-        onError: () => {
-            // Voice recognition error — no-op, UI updates via isListening
+        onError: (error) => {
+            console.warn("[Voice] Error shown to user:", error);
+            setVoiceError(error);
+            // Auto-clear error after 5 seconds
+            setTimeout(() => setVoiceError(null), 5000);
         },
     });
 
@@ -215,27 +222,43 @@ export default function ChatPage() {
     // Show welcome screen if no module selected
     if (!activeMode) {
         return (
-            <WelcomeScreen
-                onModuleSelect={handleModuleSelect}
-                onVoiceToggle={handleVoiceToggle}
-                isListening={isListening}
-                isProcessing={isProcessing}
-                interimTranscript={interimTranscript}
-            />
+            <>
+                <WelcomeScreen
+                    onModuleSelect={handleModuleSelect}
+                    onVoiceToggle={handleVoiceToggle}
+                    isListening={isListening}
+                    isProcessing={isProcessing}
+                    interimTranscript={interimTranscript}
+                />
+                {voiceError && (
+                    <div className="voice-error-toast" onClick={() => setVoiceError(null)}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>warning</span>
+                        {voiceError}
+                    </div>
+                )}
+            </>
         );
     }
 
     // Show chat view
     return (
-        <ChatView
-            messages={messages}
-            activeMode={activeMode}
-            onSend={handleSendMessage}
-            onVoiceToggle={handleVoiceToggle}
-            isListening={isListening}
-            isProcessing={isProcessing}
-            interimTranscript={interimTranscript}
-            onBack={handleBack}
-        />
+        <>
+            <ChatView
+                messages={messages}
+                activeMode={activeMode}
+                onSend={handleSendMessage}
+                onVoiceToggle={handleVoiceToggle}
+                isListening={isListening}
+                isProcessing={isProcessing}
+                interimTranscript={interimTranscript}
+                onBack={handleBack}
+            />
+            {voiceError && (
+                <div className="voice-error-toast" onClick={() => setVoiceError(null)}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>warning</span>
+                    {voiceError}
+                </div>
+            )}
+        </>
     );
 }

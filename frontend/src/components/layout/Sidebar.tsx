@@ -22,6 +22,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
     { href: "/chat", label: "Chat", labelHi: "चैट", icon: "chat", auth: "any" },
+    { href: "/portals", label: "Portals", labelHi: "पोर्टल", icon: "language", auth: "any" },
     { href: "/dashboard", label: "Dashboard", labelHi: "डैशबोर्ड", icon: "dashboard", auth: "admin" },
     { href: "/history", label: "History", labelHi: "इतिहास", icon: "history", auth: "auth" },
     { href: "/profile", label: "Profile", labelHi: "प्रोफ़ाइल", icon: "person", auth: "auth" },
@@ -40,6 +41,12 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
     const pathname = usePathname();
     const { isAuthenticated, isAdmin, handleLogout } = useAuth();
     const { language } = useModeStore();
+
+    // Prevent hydration mismatch: pathname-based active state is only
+    // meaningful on the client. Keep it false during SSR so the server
+    // and first client render produce identical HTML.
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
 
     // Keyboard shortcut: Ctrl+B to toggle sidebar
     useEffect(() => {
@@ -62,6 +69,7 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
     });
 
     const isActive = (href: string) => {
+        if (!mounted) return false; // suppress during SSR
         if (href === "/chat") return pathname === href || pathname === "/chat";
         return pathname === href || pathname.startsWith(href + "/");
     };

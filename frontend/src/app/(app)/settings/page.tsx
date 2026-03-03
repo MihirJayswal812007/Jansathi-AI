@@ -206,7 +206,7 @@ export default function SettingsPage() {
                     </h2>
                     <div className="space-y-4">
                         {section.items.map((item) => (
-                            <div key={item.label} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                            <div key={item.label} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 settings-item-row flex-wrap gap-3">
                                 <div className="flex-1 min-w-0 mr-4">
                                     <div className="text-sm font-medium text-white">{item.label}</div>
                                     <div className="text-xs text-gray-400 mt-1">{item.desc}</div>

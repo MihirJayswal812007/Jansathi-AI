@@ -126,8 +126,8 @@ export default function ProfilePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
             >
-                <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-2xl font-bold font-space shrink-0 shadow-lg shadow-blue-500/20">
+                <div className="flex items-center gap-6 profile-header-flex">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-2xl font-bold font-space shrink-0 shadow-lg shadow-blue-500/20 profile-avatar">
                         {initials}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -239,7 +239,7 @@ export default function ProfilePage() {
                     </h2>
                     <div className="space-y-4">
                         {/* Voice toggle */}
-                        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 settings-item-row flex-wrap gap-3">
                             <div>
                                 <div className="text-sm font-medium text-white">Voice Input</div>
                                 <div className="text-xs text-gray-400 mt-1">Enable voice recognition for chat</div>
@@ -253,7 +253,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Font size */}
-                        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 settings-item-row flex-wrap gap-3">
                             <div>
                                 <div className="text-sm font-medium text-white">Font Size</div>
                                 <div className="text-xs text-gray-400 mt-1">Adjust text size throughout the app</div>
@@ -272,7 +272,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Language */}
-                        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 settings-item-row flex-wrap gap-3">
                             <div>
                                 <div className="text-sm font-medium text-white">Language</div>
                                 <div className="text-xs text-gray-400 mt-1">Default language for chat and UI</div>
