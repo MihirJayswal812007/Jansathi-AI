@@ -40,6 +40,8 @@ services:
         sync: false
       - key: ALLOWED_ORIGINS
         value: "https://jansathi-frontend.onrender.com"
+      - key: SHOW_DEV_OTP
+        value: "true"
 
   # ── Frontend (Next.js) ─────────────────────────────────────
   - type: web

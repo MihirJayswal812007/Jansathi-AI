@@ -103,8 +103,12 @@ class OTPService {
             expiresInSeconds: OTP.expirySeconds,
         };
 
-        // Dev-only: expose OTP for testing (NEVER in production)
-        if (process.env.NODE_ENV === "development") {
+        // Expose OTP for testing:
+        // - Always in development mode
+        // - In production if SHOW_DEV_OTP=true (demo deployments without SMS gateway)
+        const isDevMode = process.env.NODE_ENV === "development";
+        const showDevOtp = process.env.SHOW_DEV_OTP === "true";
+        if (isDevMode || showDevOtp) {
             result.devOtp = code;
         }
 

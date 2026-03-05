@@ -69,7 +69,10 @@ export default function LoginPage() {
             const result = await requestOTP(identifier.trim());
             if (result.success) {
                 setStep('otp');
-                if (result.devOtp) setDevOtp(result.devOtp);
+                if (result.devOtp) {
+                    setDevOtp(result.devOtp);
+                    setOtpCode(result.devOtp); // auto-fill so user just clicks Verify
+                }
             } else {
                 setError(result.message || 'Failed to send OTP');
             }
