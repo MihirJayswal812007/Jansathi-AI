@@ -55,6 +55,6 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_API_URL
-        value: "https://jansathi-backend.onrender.com"
+        value: "https://jansathi-backend-xfez.onrender.com"
       - key: NEXT_PUBLIC_ADMIN_SECRET
         sync: false
