@@ -24,6 +24,7 @@ services:
     # Render's npm sometimes strips +x from node_modules/.bin/ scripts.
     buildCommand: "npm install && chmod +x ./node_modules/.bin/* && npx prisma generate && npx tsc"
     startCommand: node dist/index.js
+    healthCheckPath: /api/health
 
     envVars:
       - key: NODE_ENV

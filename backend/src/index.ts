@@ -114,9 +114,9 @@ export const app = createApp();
 if (require.main === module) {
     const PORT = parseInt(process.env.PORT || "4000", 10);
 
-    const server = app.listen(PORT, async () => {
+    const server = app.listen(PORT, "0.0.0.0", async () => {
         logger.info("server.started", { port: PORT, env: APP.env });
-        console.log(`\n  🚀 JanSathi AI Backend running on http://localhost:${PORT}\n`);
+        console.log(`\n  🚀 JanSathi AI Backend running on http://0.0.0.0:${PORT}\n`);
 
         // Provider health check — fail-fast if provider is configured but unhealthy
         const health = await llmProvider.healthCheck();
