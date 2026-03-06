@@ -97,7 +97,7 @@ export default function LoginPage() {
             if (result.success && result.session) {
                 setAuth(result.session);
                 setStep('success');
-                const destination = result.session.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+                const destination = result.session.role === 'admin' ? '/dashboard' : '/chat';
                 setTimeout(() => router.push(destination), 1500);
             } else {
                 setError(result.message || 'Invalid OTP');
