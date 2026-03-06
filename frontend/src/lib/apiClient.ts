@@ -3,9 +3,10 @@
 
 import { ChatMessage, ModeName } from "@/types/modules";
 
-// When NEXT_PUBLIC_API_URL is set, requests go to the external backend.
-// When empty (default), requests go to same-origin Next.js API routes.
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+// All requests hit same-origin Next.js routes. and are proxied 
+// to the external backend via Next.js next.config.ts `rewrites`.
+// This bypasses browser 3rd-party cookie blocking.
+const API_BASE = "";
 
 // ── CSRF Token Helper ───────────────────────────────────────
 

@@ -22,6 +22,22 @@ const nextConfig: NextConfig = {
   // webpack from bundling Three.js during SSR compilation
   serverExternalPackages: ["three", "@react-three/fiber", "@react-three/drei", "gsap"],
 
+  // ── API Rewrites (Fixes cross-origin cookie blocking) ───────
+  // Proxies /api/* to the external backend so the browser treats
+  // the session and CSRF cookies as first-party cookies.
+  async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL;
+    if (backendUrl) {
+      return [
+        {
+          source: "/api/:path*",
+          destination: `${backendUrl}/api/:path*`,
+        },
+      ];
+    }
+    return [];
+  },
+
   // ── Security headers ──────────────────────────────────────
   async headers() {
     return [
