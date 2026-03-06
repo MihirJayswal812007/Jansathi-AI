@@ -106,7 +106,7 @@ function setTokenCookie(res: Response, token: string): void {
     res.cookie(CSRF_COOKIE, token, {
         httpOnly: false, // JS must read this to send in header
         secure: APP.isProd,
-        sameSite: APP.isProd ? "strict" : "lax",
+        sameSite: APP.isProd ? "none" : "lax",
         path: "/",
         maxAge: 24 * 60 * 60 * 1000, // 24h
     });

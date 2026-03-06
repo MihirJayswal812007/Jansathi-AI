@@ -88,7 +88,9 @@ export function setSessionCookie(res: Response, token: string) {
     res.cookie(AUTH.sessionCookieName, token, {
         httpOnly: true,
         secure: APP.isProd,
-        sameSite: APP.isProd ? "strict" : "lax",
+        // SameSite=None is required for cross-origin cookie sharing
+        // (frontend & backend are on different onrender.com subdomains)
+        sameSite: APP.isProd ? "none" : "lax",
         maxAge: SESSION_MAX_AGE * 1000,
         path: "/",
     });
@@ -105,7 +107,7 @@ export function clearSessionCookie(res: Response): void {
     res.clearCookie(AUTH.sessionCookieName, {
         httpOnly: true,
         secure: APP.isProd,
-        sameSite: APP.isProd ? "strict" : "lax",
+        sameSite: APP.isProd ? "none" : "lax",
         path: "/",
     });
 }
