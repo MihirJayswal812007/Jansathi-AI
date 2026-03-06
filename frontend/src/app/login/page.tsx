@@ -97,7 +97,8 @@ export default function LoginPage() {
             if (result.success && result.session) {
                 setAuth(result.session);
                 setStep('success');
-                setTimeout(() => router.push('/chat'), 1500);
+                const destination = result.session.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+                setTimeout(() => router.push(destination), 1500);
             } else {
                 setError(result.message || 'Invalid OTP');
             }
@@ -250,7 +251,7 @@ export default function LoginPage() {
                                 >
                                     {step === 'phone' && 'Sign in to access digital services'}
                                     {step === 'otp' && `Enter the OTP sent to ${identifier}`}
-                                    {step === 'success' && 'Redirecting you to chat...'}
+                                    {step === 'success' && 'Redirecting you to your dashboard...'}
                                 </motion.p>
                             </div>
 
