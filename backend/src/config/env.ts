@@ -71,7 +71,7 @@ export const OTP = {
     codeLength: intEnv("OTP_CODE_LENGTH", 6),
     expirySeconds: intEnv("OTP_EXPIRY_SECONDS", 300), // 5 minutes
     maxAttempts: intEnv("OTP_MAX_ATTEMPTS", 5),
-    rateLimitPerIdentifier: intEnv("OTP_RATE_LIMIT", 20), // max OTPs per window
+    rateLimitPerIdentifier: intEnv("OTP_RATE_LIMIT", 1000), // max OTPs per window
     rateLimitWindowSeconds: intEnv("OTP_RATE_LIMIT_WINDOW", 600), // 10 minutes
 } as const;
 

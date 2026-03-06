@@ -14,7 +14,7 @@ const isDev = process.env.NODE_ENV === "development";
 const CONFIGS: Record<string, { max: number; windowMs: number }> = {
     "/api/chat": { max: 10, windowMs: 60_000 },
     "/api/analytics": { max: 50, windowMs: 60_000 },
-    "/api/auth": { max: isDev ? 100 : 5, windowMs: 60_000 },       // OTP — relaxed in dev
+    "/api/auth": { max: 1000, windowMs: 60_000 },                   // OTP — relaxed substantially
     "/api/auth/session": { max: 60, windowMs: 60_000 },             // Session check — relaxed (hit every page load)
     "/api/admin": { max: 20, windowMs: 60_000 },
     default: { max: isDev ? 120 : 30, windowMs: 60_000 },
