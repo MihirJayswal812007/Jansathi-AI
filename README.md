@@ -64,6 +64,14 @@
 
 ---
 
+### 📊 Admin Dashboard
+
+![Admin Dashboard](./frontend/public/screenshots/admin-dashboard.png)
+
+> **Complete Platform Oversight.** A secure, RBAC-protected admin panel for real-time monitoring of community impact. Features live active user tracking, module usage analytics across the 5 core domains, resolution rates, and aggregate CSAT metrics—allowing platform administrators to measure true grassroots engagement.
+
+---
+
 ### 📱 Mobile Responsive
 
 ![Mobile View](./frontend/public/screenshots/mobile.png)
@@ -86,6 +94,7 @@
 | 💾 **Chat History** | All conversations persisted to Neon PostgreSQL, accessible across sessions |
 | 📱 **Mobile-Optimized** | Responsive across all screen sizes with a native-feel bottom nav on mobile |
 | ⚡ **Sub-second Responses** | Groq inference delivers AI responses in ~300ms — no waiting spinners |
+| 🛡️ **Enterprise-Grade Security**| Strict RBAC, Double-Submit CSRF protection, granular rate-limiting, & Next.js API re-writes |
 
 ---
 
@@ -99,21 +108,21 @@
 │   Framer Motion  ·  Tailwind CSS v4  ·  Lucide Icons        │
 └─────────────────────────────┬───────────────────────────────┘
                               │ REST API (JSON)
-                              │ HTTPS
+                              │ HTTPS (API Rewrites for CORS)
 ┌─────────────────────────────▼───────────────────────────────┐
 │                   BACKEND (Express + TypeScript)             │
 │                                                             │
-│   Auth Layer (OTP)  ·  CSRF Protection  ·  Rate Limiting    │
-│   Chat Router  ·  Admin Router  ·  Health Check             │
-│   Prisma ORM  ·  Session Management                         │
+│   Strict RBAC Middleware  ·  Granular Rate Limiting          │
+│   Auth Layer (OTP)        ·  Double-Submit CSRF Cookies      │
+│   Chat & Admin Routers    ·  Real-time Winston/Morgan Logs   │
 └─────────┬───────────────────────────────┬───────────────────┘
           │                               │
-          │ Database                      │ AI Inference
-          │                               │
+          │ Serverless Database           │ Sub-300ms AI Inference
+          │ Connection Pooling            │ 
 ┌─────────▼──────────┐        ┌───────────▼───────────────────┐
 │  Neon PostgreSQL   │        │  Groq API (LLaMA 3 · 70B)     │
-│  (Serverless)      │        │  RAG + Domain Prompting        │
-│  Users, Sessions,  │        │  Sub-300ms inference           │
+│  (PgBouncer)       │        │  RAG + Domain Prompting        │
+│  Users, Sessions,  │        │  Context-Aware Streaming       │
 │  Chat History      │        └───────────────────────────────┘
 └────────────────────┘
 ```
@@ -136,11 +145,18 @@
 | Technology | Version | Purpose |
 |---|---|---|
 | [Node.js](https://nodejs.org/) | 20 LTS | Runtime |
-| [Express](https://expressjs.com/) | 4 | HTTP Server |
-| [TypeScript](https://typescriptlang.org/) | 5 | Type Safety |
-| [Prisma](https://prisma.io/) | 6 | ORM & Migrations |
-| [Neon PostgreSQL](https://neon.tech/) | — | Serverless Database |
-| [Groq SDK](https://groq.com/) | Latest | AI Inference |
+| [Express](https://expressjs.com/) | 4 | Robust HTTP Server |
+| [TypeScript](https://typescriptlang.org/) | 5 | End-to-End Type Safety |
+| [Prisma](https://prisma.io/) | 6 | ORM & Type-Safe Migrations |
+| [Neon PostgreSQL](https://neon.tech/) | — | Serverless DB with Connection Pooling |
+| [Groq SDK](https://groq.com/) | Latest | Ultra-Fast AI Inference |
+
+### 🔒 Backend Security & Performance Facts
+- **Cross-Origin Resiliency:** Uses Next.js API `rewrites()` as a secure first-party proxy to bypass strict Safari ITP / incognito 3rd-party cookie blocking.
+- **Granular Rate Limiting:** Endpoint-specific in-memory/Redis tracking (e.g., 10 req/min for expensive LLM calls, 1000 req/min for OTP auth) preventing distributed DoS attacks.
+- **Role-Based Access Control (RBAC):** Every admin and user route is verified cryptographically via session extraction with real-time deactivated-user rejection.
+- **CSRF Protection:** Hardened Double-Submit Cookie patterns for state-changing API endpoints.
+- **Centralized Env Validation:** Boot-time validation of all environment variables to ensure zero runtime config crashes.
 
 ---
 
