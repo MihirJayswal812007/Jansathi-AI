@@ -83,6 +83,17 @@ export function createApp() {
     app.use("/api/admin", adminRouter);
     app.use("/api/user", userRouter);
 
+    // ── Root Route ──────────────────────────────────────────
+    app.get("/", (_req, res) => {
+        res.status(200).json({
+            status: "ok",
+            message: "JanSathi AI Backend is ready 🚀",
+            service: APP.name,
+            version: "1.0.0",
+            timestamp: new Date().toISOString(),
+        });
+    });
+
     // ── 404 Handler ─────────────────────────────────────────
     app.use((_req, res) => {
         res.status(404).json({ error: "NOT_FOUND", message: "Route not found" });
